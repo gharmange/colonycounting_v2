@@ -14,7 +14,7 @@ function distance_to_transform = get_transformation_coords_in_one_dimension(list
     image_right = readmm(fullfile(image_info_right(1).folder, image_info_right(1).name));
     image_right = image_right.imagedata;
     
-    % scale (?) images and convert to double:
+    % scale images and convert to double:
     image_left = double(scale(image_left));
     image_right = double(scale(image_right));
 
@@ -25,9 +25,9 @@ function distance_to_transform = get_transformation_coords_in_one_dimension(list
     distance_to_transform = moving - fixed;
     
     % get the median distance (for when the user set multiple points):
-    distance_to_transform = median(distance_to_transform);
+    distance_to_transform = median(distance_to_transform, 1);
     
-    % round the distance to a whole number:
+    % round the distance to a whole number (since you cannot have half a pixel):
     distance_to_transform = round(distance_to_transform);
 
 end

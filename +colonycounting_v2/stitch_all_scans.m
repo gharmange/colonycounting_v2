@@ -39,29 +39,38 @@ function stitch_all_scans(varargin)
         num_tiles_row = str2double(answer{2});
         num_tiles_column = str2double(answer{3});
         
-        % remove the Metamorph stitched image from the list of images:
-        list_images = stitch_info(i).list_images;
-        [~, rows_to_remove] = colonycounting_v2.utilities.get_structure_results_containing_string(list_images, 'name', num2str((num_tiles_row*num_tiles_column) + 1));
-        list_images(rows_to_remove) = [];
-        
-        
+        % for each channel:
+        for j = 1:numel(stitch_info(i).images)
+           
+            % remove the Metamorph stitched image from the list of images:
+            list_images = stitch_info(i).images(j).list_images;
+            [~, rows_to_remove] = colonycounting_v2.utilities.get_structure_results_containing_string(list_images, 'name', num2str((num_tiles_row*num_tiles_column) + 1));
+            list_images(rows_to_remove) = [];
 
+            % save to stitch info structure:
+            stitch_info(i).images(j).list_images = list_images;
+            
+        end
+        
         % save to stitch info structure:
-        stitch_info(i).list_images = list_images;
         stitch_info(i).num_tiles_row = num_tiles_row;
         stitch_info(i).num_tiles_column = num_tiles_column;
         
     end
     
-    %%% Next, we need the user to align each scan.
+    %%% Next, we need the user to align each scan using cpselect.
     
     % for each scan:
     for i = 1:num_scans
-       
+        
+        % get the list of dapi images:
+        [~, row] = colonycounting_v2.utilities.get_structure_results_matching_string(stitch_info(i).images, 'channel', 'dapi');
+        list_images_dapi = stitch_info(i).images(row).list_images;
+        
         % align each scan:
         [stitch_info(i).transform_coords_row, stitch_info(i).transform_coords_column] = ...
             colonycounting_v2.stitch_all_scans.align_a_scan(...
-            stitch_info(i).list_images, ...
+            list_images_dapi, ...
             stitch_info(i).num_tiles_row, ...
             stitch_info(i).num_tiles_column);
         
@@ -73,8 +82,8 @@ function stitch_all_scans(varargin)
     for i = 1:num_scans
         
         % stitch the image:
-        colonycounting_v2.stitch_all_scans.stitch_a_scan(list_scans{i}, list_images_one_scan, num_rows, num_columns);
+        colonycounting_v2.stitch_all_scans.stitch_a_scan(stitch_info(i));
         
     end
-
+    
 end
