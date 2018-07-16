@@ -46,64 +46,26 @@ function segment_all_scans(varargin)
 %             % create rgb-version of stitch to add outlines to:
 %             stitch_annotated = repmat(stitch, 1, 1, 3);
             
-            % create structure to store well boundaries:
+            % create structure to store boundaries:
             boundaries_well = struct;
             boundaries_well.number = [];
-            boundaries_well.coordinates = [];
+            boundaries_well.coordinates_boundary = [];
+            boundaries_well.coordinates_mask = [];
+            boundaries_colonies = struct;
+            boundaries_colonies.number = [];
+            boundaries_colonies.coordinates_boundary = [];
+            boundaries_colonies.coordinates_mask = [];
 
             % segment the well:
             instructions_well = 'Segment the well.';
-            enable_multiple_well = 'off';
-            boundaries_well = colonycounting_v2.segment_all_scans.gui_to_segment_a_stitch(stitch, boundaries_well, instructions_well, enable_multiple_well);
+            boundaries_well = colonycounting_v2.segment_all_scans.gui_to_segment_a_stitch(stitch, boundaries_well, instructions_well);
             
-            
-            
-            % display the stitch:
-            imshow(stitch);
-            
-            % ask user if they want to segment the well:
-            option_segment_well = questdlg('Do you want to segment the well?', 'Well Segmentation', 'Yes', 'No', 'Yes');
-            
-            % if the user wants to segment the well:
-            if strcmp(option_segment_well, 'Yes')
-               
-                % let the user segment the well:
-                handle_well = imfreehand('Closed', true);
-                
-                % save well boundaries:
-                stitch_info.boundaries = struct;
-                stitch_info.boundaries.type = 'well';
-                stitch_info.boundaries.coords = getPosition(handle_well);
-                
-                % plot boundaries on annotated stitch:
-                stitch_annotated = colonycounting_v2.utilities.add_outlines_to_image(stitch_annotated, stitch_info.boundaries);
-                
-            end
-            
-            % set status to continue segmenting colonies:
-            status = 'Yes';
-            
-            % while the user wants to add colonies:
-            while strcmp(status, 'Yes')
-                
-                % display the annotated stitch:
-                handle_display = imshow(stitch_annotated);
-               
-                % let the user segment the well:
-                handle_colony = imfreehand('Closed', true);
-                
-                % save colony boundaries:
-                stitch_info.boundaries(end+1).type = 'colony';
-                stitch_info.boundaries(end).coords = getPosition(handle_colony);
-                
-                % plot boundaries on annotated stitch:
-                stitch_annotated = colonycounting_v2.utilities.add_outlines_to_image(stitch_annotated, stitch_info.boundaries);
-                
-                % ask user if they want to add more colonies:
-                status = questdlg('Do you want to add another colony?', 'Colony Segmentation', 'Yes', 'No', 'Yes');
-                
-            end
-            
+            % segment the colonies:
+            instructions_colonies = 'Segment the colonies.';
+            boundaries_colonies = colonycounting_v2.segment_all_scans.gui_to_segment_a_stitch(stitch, boundaries_colonies, instructions_colonies);
+
+            % save boundaries:
+
             % save the stitch info:
             save(fullfile(path_scan, list_stitch_info(j).name), 'stitch_info');
             

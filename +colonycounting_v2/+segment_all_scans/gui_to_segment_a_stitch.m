@@ -1,15 +1,13 @@
-function boundaries_well = gui_to_segment_a_stitch(stitch, boundaries_well, instructions, enable_multiple)
+function boundaries = gui_to_segment_a_stitch(stitch, boundaries, instructions)
 
     % create GUI:
     handles = create_GUI;
     
     % view image:
-    view_image
+    view_image;
     
     % have GUI wait:
     uiwait(handles.figure);
-    
-    boundaries_well = 4;
 
     % function to create GUI:
     function handles = create_GUI
@@ -63,30 +61,94 @@ function boundaries_well = gui_to_segment_a_stitch(stitch, boundaries_well, inst
         % plot boundaries:
         plot_boundaries;
         
+%         % have program wait:
+%         uiwait(handles.figure);
+        
     end
 
     % function to plot the boundaries:
     function plot_boundaries
        
+        % turn on the hold:
+        hold(handles.image, 'on'); 
         
+        % for each boundary:
+        for i = 1:numel(boundaries)
+            
+            % if boundary coords are not empty:
+            if ~isempty(boundaries(i).coordinates_boundary)
+                
+                % get coordinates:
+                temp_coords = boundaries(i).coordinates_boundary;
+                
+                % add first coordinate to end of coordinates (so boundary
+                % plots closed):
+                temp_coords(end+1, :) = temp_coords(1,:);
+           
+            	% plot coordinates on image:
+                plot(temp_coords(:,1), temp_coords(:,2), 'red');
+            
+            end
+            
+        end
+        
+        % turn off the hold:
+        hold(handles.image, 'off'); 
         
     end
 
     % callback to add a segmentation:
-    function callback_add(~,~)
+    function callback_add(~, ~)
         
         % allow user to draw on the stitch:
         handle_boundary = imfreehand(handles.image, 'Closed', true);
         
         % get coordinates of boundary:
-        coords = getPosition(handle_boundary);
+        temp.number = 1;
+        temp.coordinates_boundary = getPosition(handle_boundary);
         
+        % round boundary coordinates:
+        temp.coordinates_boundary = round(temp.coordinates_boundary);
         
+        % convert boundary coordinates to mask coordinates:
+        mask = poly2mask(temp.coordinates_boundary(:,1), temp.coordinates_boundary(:,2), size(stitch, 1), size(stitch, 2));
+        [temp.coordinates_mask(:,1), temp.coordinates_mask(:,2)] = find(mask == 1);
+        
+        % save coords:
+        boundaries = colonycounting_v2.utilities.add_entry_to_structure(temp, boundaries);
+        
+        % view image:
+        view_image;
         
     end
 
     % callback to delete a segmentation:
-    function callback_delete(~,~)
+    function callback_delete(~, ~)
+        
+        % wait until the user has clicked on the image:
+        temp = waitforbuttonpress;
+        
+        % ask user to click on image:
+        [point] = get(gca, 'CurrentPoint');
+        
+        % round point:
+        point = fliplr(round(point(1, 1:2)));
+        
+        % for each current boundary point:
+        for i = 1:numel(boundaries)
+                   
+            % if point falls within mask:
+            if ismember(point, boundaries(i).coordinates_mask, 'rows')
+                
+                % delete that boundary:
+                boundaries(i) = [];
+                
+            end
+            
+        end
+        
+        % view the image:
+        view_image;
         
     end
 

@@ -1,12 +1,14 @@
 function stitch_info = create_structure_to_store_stitch_info(paths)
 
+    % get number of folders:
+    num_folders = numel(paths);
+
     % create structure to store stitch info:
-    stitch_info.path_folder = [];
-    stitch_info.name_scan = [];
-    stitch_info.images = struct;
+    [stitch_info(1:num_folders).path_folder] = deal('');
+    [stitch_info(1:num_folders).scans] = deal(struct);
 
     % for each folder:
-    for i = 1:numel(paths)
+    for i = 1:num_folders
 
         % get path to folder:
         path_folder = paths{i};
@@ -20,6 +22,11 @@ function stitch_info = create_structure_to_store_stitch_info(paths)
 
         % get number of scans:
         num_scans = numel(list_scan_names);
+        
+        % create structure to store scans:
+        [scans(1:num_scans).path_folder] = deal('');
+        [scans(1:num_scans).name_scan] = deal('');
+        [scans(1:num_scans).images] = deal(struct);
 
         % for each scan:
         for j = 1:num_scans
@@ -36,13 +43,6 @@ function stitch_info = create_structure_to_store_stitch_info(paths)
             
             % get number of wavelengths:
             num_wavelengths = numel(list_wavelengths);
-            
-            % ask user to assign a channel to each wavelength:
-            prompt = [{path_folder}, list_wavelengths];
-            default = cell(num_wavelengths + 1, 1);
-            default{1} = name_scan;
-            default{2:end} = '';
-            answer = inputdlg(prompt, 'Enter Channel for Each Wavelength', [1 200], default);
 
             % create structure to store images:
             [images(1:num_wavelengths).wavelength] = deal('');
@@ -52,26 +52,31 @@ function stitch_info = create_structure_to_store_stitch_info(paths)
             % for each wavelength:
             for k = 1:num_wavelengths
                 
+                % get wavelength:
+                wavelength = list_wavelengths{k};
+                
                 % get list of images for the wavelength:
-                list_image_names_scan_wavelength = ...
+                list_images = ...
                     colonycounting_v2.utilities.get_structure_results_containing_string(...
                     list_image_names_scan, 'name', list_wavelengths{k});
-               
+                
                 % save:
-                images(k).wavelength = list_wavelengths{k};
-                images(k).channel = answer{k+1};
-                images(k).list_images = list_image_names_scan_wavelength;
+                images(k).wavelength = wavelength;
+                images(k).list_images = list_images;
                 
             end
       
-            % save to stitch info structure:
-            temp_stitch_info.path_folder = path_folder;
-            temp_stitch_info.name_scan = name_scan;
-            temp_stitch_info.images = images;
-            stitch_info = colonycounting_v2.utilities.add_entry_to_structure(temp_stitch_info, stitch_info);
-
+            % save:
+            scans(j).path_folder = path_folder;
+            scans(j).name_scan = name_scan;
+            scans(j).images = images;
+            
         end
 
+        % save:
+        stitch_info(i).path_folder = path_folder;
+        stitch_info(i).scans = scans;
+        
     end
 
 end
