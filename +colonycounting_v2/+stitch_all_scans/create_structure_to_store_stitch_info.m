@@ -41,7 +41,8 @@ function stitch_info = create_structure_to_store_stitch_info(paths)
             prompt = [{path_folder}, list_wavelengths];
             default = cell(num_wavelengths + 1, 1);
             default{1} = name_scan;
-            default{2:end} = '';
+            default{2} = '';
+            default{3} = '';
             answer = inputdlg(prompt, 'Enter Channel for Each Wavelength', [1 200], default);
 
             % create structure to store images:

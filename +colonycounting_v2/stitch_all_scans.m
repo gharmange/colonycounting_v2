@@ -6,7 +6,7 @@ function stitch_all_scans(varargin)
     if nargin == 0
         
         % set the current working directory as the path to the data:
-        paths = pwd;
+        paths = {pwd};
         
     % otherwise:
     else

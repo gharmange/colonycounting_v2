@@ -81,7 +81,7 @@ function stitch_a_scan(stitch_info)
         end
 
         % scale the stitched image:
-        image_stitched = scale(image_stitched);
+%         image_stitched = scale(image_stitched);
         
         % create a downsized version of the image:
         image_stitched_small = imresize(image_stitched, [image_size image_size]);
@@ -90,11 +90,12 @@ function stitch_a_scan(stitch_info)
         file_name = fullfile(stitch_info.path_folder, sprintf('Stitch_%s_%s', stitch_info.name_scan, stitch_info.images(j).wavelength));
 
         % set images to save:
-        image_to_save = imadjust(im2uint8(image_stitched));
-        image_to_save_small = imadjust(im2uint8(image_stitched_small));
-
+%         image_to_save = imadjust(im2uint8(image_stitched));
+%         image_to_save_small = imadjust(im2uint8(image_stitched_small));
+        image_to_save = im2uint16(image_stitched);
+        image_to_save_small = im2uint16(image_stitched_small);
         % save image as jpg:
-        imwrite(image_to_save, [file_name '.jpg']);
+        imwrite(image_to_save, [file_name '.jpg'], 'BitDepth',16);
 
         % save image as tif:
         imwrite(image_to_save, [file_name '.tif']);
