@@ -32,30 +32,39 @@ function segment_all_scans(varargin)
            
             % load the stitch info:
             stitch_info = colonycounting_v2.utilities.load_structure_from_file(fullfile(path_scan, list_stitch_info(j).name));
-
-            % get the wavelength for DAPI:
-            wavelength = colonycounting_v2.utilities.get_structure_results_matching_string(stitch_info.images, 'channel', 'dapi');
-            wavelength = wavelength.wavelength;
             
-            % get the name of the DAPI stitch:
-            name_stitch = sprintf('Stitch_%s_%s_small', stitch_info.name_scan, wavelength);
+            % get the name of the small DAPI stitch:
+            name_stitch = sprintf('Stitch_%s_%s_small', stitch_info.name_scan, 'dapi');
             
             % load the stitch:
             stitch = colonycounting_v2.utilities.load_structure_from_file(fullfile(path_scan, [name_stitch '.mat']));
             
-%             % create rgb-version of stitch to add outlines to:
-%             stitch_annotated = repmat(stitch, 1, 1, 3);
+            % get name and path for file to store boundaries:
+            file_name_boundaries = sprintf('boundaries_%s.mat', stitch_info.name_scan);
             
-            % create structure to store boundaries:
-            boundaries_well = struct;
-            boundaries_well.number = [];
-            boundaries_well.coordinates_boundary = [];
-            boundaries_well.coordinates_mask = [];
-            boundaries_colonies = struct;
-            boundaries_colonies.number = [];
-            boundaries_colonies.coordinates_boundary = [];
-            boundaries_colonies.coordinates_mask = [];
-
+            % check for existence of boundaries file:
+            if exist(fullfile(path_scan, file_name_boundaries), 'file') == 2
+                
+                % load the boundaries:
+                boundaries = colonycounting_v2.utilities.load_structure_from_file(fullfile(path_scan, file_name_boundaries));
+                boundaries_well = boundaries.well;
+                boundaries_colonies = boundaries.colonies;
+                
+            % if the boundaries file does not already exist:
+            else
+                
+                % create structure to store boundaries:
+                boundaries_well = struct;
+                boundaries_well.number = [];
+                boundaries_well.coordinates_boundary = [];
+                boundaries_well.coordinates_mask = [];
+                boundaries_colonies = struct;
+                boundaries_colonies.number = [];
+                boundaries_colonies.coordinates_boundary = [];
+                boundaries_colonies.coordinates_mask = [];
+                
+            end
+            
             % segment the well:
             instructions_well = 'Segment the well.';
             boundaries_well = colonycounting_v2.segment_all_scans.gui_to_segment_a_stitch(stitch, boundaries_well, instructions_well);
@@ -64,7 +73,13 @@ function segment_all_scans(varargin)
             instructions_colonies = 'Segment the colonies.';
             boundaries_colonies = colonycounting_v2.segment_all_scans.gui_to_segment_a_stitch(stitch, boundaries_colonies, instructions_colonies);
 
+            % make annotated stitch:
+            boundaries.well = boundaries_well;
+            boundaries.colonies = boundaries_colonies;
+            stitch_annotated = colonycounting_v2.segment_all_scans.add_all_boundaries_to_stitch(stitch, boundaries);
+            
             % save boundaries:
+            save(fullfile(path_scan, file_name_boundaries), 'boundaries');
 
             % save the stitch info:
             save(fullfile(path_scan, list_stitch_info(j).name), 'stitch_info');
