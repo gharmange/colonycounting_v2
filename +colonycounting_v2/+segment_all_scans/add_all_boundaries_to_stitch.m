@@ -3,26 +3,24 @@ function image_annotated = add_all_boundaries_to_stitch(image, boundaries)
     % create rgb version of image:
     image_annotated = repmat(image, 1, 1, 3);
     
-    % get list of boundaries:
-    boundary_types = fieldnames(boundaries);
-    
-    % get number of boundary types:
-    num_boundary_types = numel(boundary_types);
-    
     % get colors for each type of boundary:
-    colors = jet(num_boundary_types);
+    color.well = [0 1 0];
+    color.colonies = [1 0 0];
     
-    % for each type of boundary:
-    for i = 1:numel(boundary_types)
-       
-        % for each boundary:
-        for j = 1:numel(boundaries.(boundary_types{i}))
-            
-            % add to image:
-            image_annotated = colonycounting_v2.segment_all_scans.add_boundary_to_stitch(image_annotated, boundaries.(boundary_types{i})(j).coordinates_boundary, colors(i,:));
-            
-        end
-        
+    % for each well boundary:
+    for j = 1:numel(boundaries.well)
+
+        % add to image:
+        image_annotated = colonycounting_v2.utilities.add_boundary_to_stitch(image_annotated, boundaries.well(j).coordinates_boundary_small, color.well);
+
+    end
+
+    % for each colony boundary:
+    for j = 1:numel(boundaries.colonies)
+
+        % add to image:
+        image_annotated = colonycounting_v2.utilities.add_boundary_to_stitch(image_annotated, boundaries.colonies(j).coordinates_boundary_small, color.colonies);
+
     end
 
 end

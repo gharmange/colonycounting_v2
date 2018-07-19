@@ -20,13 +20,6 @@ function stitch_all_wavelengths(scan)
     % for each position:
     for i = 1:num_positions
 
-%         % get the row and column number of the position:
-%         [temp_row, temp_col] = find(matrix_of_positions == i);
-%         
-%         % convert the row and column number into coordinates:
-%         coords_ul_corner_column(i)  = temp_row * scan.shift_column.column + temp_col * scan.shift_row.column;
-%         coords_ul_corner_row(i) = temp_row * scan.shift_column.row + temp_col * scan.shift_row.row;
-
         % get the row and column number of the position:
         [position_row, position_column] = find(matrix_of_positions == i);
         
@@ -101,20 +94,19 @@ function stitch_all_wavelengths(scan)
                 ) = temp_image_slice;
 
         end
-
-%             % scale the stitched image:
-%             image_stitched = scale(image_stitched);
-
+        
         % create a downsized version of the image:
         image_stitched_small = imresize(image_stitched, [image_size image_size]);
+        
+        % get the scale factor:
+        scan.scale_rows = size(image_stitched, 1) / image_size;
+        scan.scale_columns = size(image_stitched, 2) / image_size;
 
         % set file name:
         file_name = fullfile(scan.path_folder, sprintf('Stitch_%s_%s', scan.name_scan, scan.images(i).channel));
         file_name_small = fullfile(scan.path_folder, sprintf('Stitch_%s_%s_small', scan.name_scan, scan.images(i).channel));
 
         % set images to save:
-%             image_to_save = imadjust(im2uint8(image_stitched));
-%             image_to_save_small = imadjust(im2uint8(image_stitched_small));
         image_to_save = image_stitched;
         image_to_save_small = image_stitched_small;
 

@@ -6,7 +6,7 @@ function stitch_all_scans(varargin)
     if nargin == 0
         
         % set the current working directory as the path to the data:
-        paths = pwd;
+        paths = {pwd};
         
     % otherwise:
     else
@@ -32,7 +32,7 @@ function stitch_all_scans(varargin)
     
     stitch_info = colonycounting_v2.stitch_all_scans.get_scan_dimensions(stitch_info);
     
-    %%% Next, we need get the amount to shift the images by 
+    %%% Next, we need get the amount to shift the images by. 
     
     stitch_info = colonycounting_v2.stitch_all_scans.get_shifts(stitch_info);
     

@@ -35,9 +35,9 @@ function [shift_column, shift_row] = get_shift(images, num_rows, num_columns, fo
     position_num_right = matrix_of_positions(tile_row_middle, tile_column_middle + 1);
     
     % convert position numbers to strings:
-    position_num_middle_string = ['s' num2string(position_num_middle, '%.0f')];
-    position_num_below_string = ['s' num2string(position_num_below, '%.0f')];
-    position_num_right_string = ['s' num2string(position_num_right, '%.0f')];
+    position_num_middle_string = ['s' num2str(position_num_middle, '%.0f')];
+    position_num_below_string = ['s' num2str(position_num_below, '%.0f')];
+    position_num_right_string = ['s' num2str(position_num_right, '%.0f')];
     
     % get name and path of images:
     image_info_middle = colonycounting_v2.utilities.get_structure_results_containing_string(list_images, 'name', position_num_middle_string);

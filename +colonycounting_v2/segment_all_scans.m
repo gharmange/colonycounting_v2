@@ -6,7 +6,7 @@ function segment_all_scans(varargin)
     if nargin == 0
         
         % set the current working directory as the path to the data:
-        paths = pwd;
+        paths = {pwd};
         
     % otherwise:
     else
@@ -55,13 +55,13 @@ function segment_all_scans(varargin)
                 
                 % create structure to store boundaries:
                 boundaries_well = struct;
-                boundaries_well.number = [];
-                boundaries_well.coordinates_boundary = [];
-                boundaries_well.coordinates_mask = [];
+                boundaries_well.coordinates_boundary_small = [];
+                boundaries_well.coordinates_mask_small = [];
+                boundaries_well.status = '';
                 boundaries_colonies = struct;
-                boundaries_colonies.number = [];
-                boundaries_colonies.coordinates_boundary = [];
-                boundaries_colonies.coordinates_mask = [];
+                boundaries_colonies.coordinates_boundary_small = [];
+                boundaries_colonies.coordinates_mask_small = [];
+                boundaries_colonies.status = '';
                 
             end
             
@@ -85,7 +85,7 @@ function segment_all_scans(varargin)
             save(fullfile(path_scan, list_stitch_info(j).name), 'stitch_info');
             
             % save the annotated image:
-            imwrite(stitch_annotated, fullfile(path_scan, [name_stitch '_annotated.tif']));
+            imwrite(stitch_annotated, fullfile(path_scan, [name_stitch '_segmentation.tif']));
             
         end
         

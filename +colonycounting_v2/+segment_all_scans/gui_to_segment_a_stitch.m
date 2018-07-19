@@ -72,11 +72,11 @@ function boundaries = gui_to_segment_a_stitch(stitch, boundaries, instructions)
         % for each boundary:
         for i = 1:numel(boundaries)
             
-            % if boundary coords are not empty:
-            if ~isempty(boundaries(i).coordinates_boundary)
+            % if boundary should be displayed:
+            if strcmp(boundaries(i).status, 'keep')
                 
                 % get coordinates:
-                temp_coords = boundaries(i).coordinates_boundary;
+                temp_coords = boundaries(i).coordinates_boundary_small;
                 
                 % add first coordinate to end of coordinates (so boundary
                 % plots closed):
@@ -108,16 +108,18 @@ function boundaries = gui_to_segment_a_stitch(stitch, boundaries, instructions)
         % wait for user to double-click:
         wait(handle_boundary);
 
+        % get status of boundary:
+        temp.status = 'keep';
+        
         % get coordinates of boundary:
-        temp.number = 1;
-        temp.coordinates_boundary = getPosition(handle_boundary);
+        temp.coordinates_boundary_small = getPosition(handle_boundary);
 
         % round boundary coordinates:
-        temp.coordinates_boundary = round(temp.coordinates_boundary);
+        temp.coordinates_boundary_small = round(temp.coordinates_boundary_small);
 
         % convert boundary coordinates to mask coordinates:
-        mask = poly2mask(temp.coordinates_boundary(:,1), temp.coordinates_boundary(:,2), size(stitch, 1), size(stitch, 2));
-        [temp.coordinates_mask(:,1), temp.coordinates_mask(:,2)] = find(mask == 1);
+        mask = poly2mask(temp.coordinates_boundary_small(:,1), temp.coordinates_boundary_small(:,2), size(stitch, 1), size(stitch, 2));
+        [temp.coordinates_mask_small(:,1), temp.coordinates_mask_small(:,2)] = find(mask == 1);
 
         % save coords:
         boundaries = colonycounting_v2.utilities.add_entry_to_structure(temp, boundaries);
@@ -139,24 +141,18 @@ function boundaries = gui_to_segment_a_stitch(stitch, boundaries, instructions)
         % round point:
         point = fliplr(round(point(1, 1:2)));
 
-        % create array to store rows to remove:
-        rows_remove = [];
-
         % for each current boundary point:
         for i = 1:numel(boundaries)
 
             % if point falls within mask:
-            if ismember(point, boundaries(i).coordinates_mask, 'rows')
+            if ismember(point, boundaries(i).coordinates_mask_small, 'rows')
 
-                % add row to list of rows to remove:
-                rows_remove = [rows_remove i];
+                % set that boundaries status to remove:
+                boundaries(i).status = 'remove';
 
             end
 
         end
-
-        % remove boundaries:
-        boundaries(rows_remove) = [];
 
         % view the image:
         view_image;
@@ -165,6 +161,9 @@ function boundaries = gui_to_segment_a_stitch(stitch, boundaries, instructions)
 
     % callback to be done:
     function callback_done(~,~)
+        
+        % remove any boundaries the user wanted to delete:
+        boundaries = colonycounting_v2.utilities.get_structure_results_matching_string(boundaries, 'status', 'keep');
         
         % close the GUI:
         close(handles.figure);
