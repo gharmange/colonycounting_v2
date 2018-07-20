@@ -11,7 +11,7 @@ function image_annotated = add_all_boundaries_to_stitch(image, boundaries)
     for j = 1:numel(boundaries.well)
 
         % add to image:
-        image_annotated = colonycounting_v2.utilities.add_boundary_to_stitch(image_annotated, boundaries.well(j).coordinates_boundary_small, color.well);
+        image_annotated = colonycounting_v2.utilities.add_boundary_to_stitch(image_annotated, boundaries.well(j).coordinates_boundary_small, color.well, 1);
 
     end
 
@@ -19,7 +19,7 @@ function image_annotated = add_all_boundaries_to_stitch(image, boundaries)
     for j = 1:numel(boundaries.colonies)
 
         % add to image:
-        image_annotated = colonycounting_v2.utilities.add_boundary_to_stitch(image_annotated, boundaries.colonies(j).coordinates_boundary_small, color.colonies);
+        image_annotated = colonycounting_v2.utilities.add_boundary_to_stitch(image_annotated, boundaries.colonies(j).coordinates_boundary_small, color.colonies, 1);
 
     end
 

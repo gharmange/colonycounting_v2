@@ -61,12 +61,18 @@ function count_cells_all_scans(varargin)
             % create image with the cells and boundaries plotted:
             stitch_annotated = colonycounting_v2.count_cells_all_scans.add_all_boundaries_and_cells_to_stitch(stitch, centroids, boundaries);
             
+            % create downsized version of annotated image:
+            stitch_annotated_small = imresize(stitch_annotated, [size(stitch_annotated, 1)/stitch_info.scale_rows, size(stitch_annotated, 2)/stitch_info.scale_columns]);
+            
             % save centroids and boundaries:
             save(fullfile(path_scan, sprintf('cell_centroids_%s.mat', stitch_info.name_scan)), 'centroids');
             save(fullfile(path_scan, sprintf('boundaries_cell_centroids_%s.mat', stitch_info.name_scan)), 'boundaries');
             
             % save annotated stitched image:
             save(fullfile(path_scan, sprintf('%s_segmentation_cells.mat', name_stitch)), 'stitch_annotated');
+            
+            % save small annotated stitched image:
+            imwrite(stitch_annotated_small, fullfile(path_scan, sprintf('%s_small_segmentation_cells.tif', name_stitch)));
             
         end
         

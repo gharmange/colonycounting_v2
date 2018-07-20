@@ -110,11 +110,10 @@ function stitch_all_wavelengths(scan)
         image_to_save = image_stitched;
         image_to_save_small = image_stitched_small;
 
-        % save image as tif:
-        imwrite(image_to_save, [file_name '.tif']);
+        % save small image as tif:
         imwrite(image_to_save_small, [file_name_small '.tif']);
 
-        % save image as mat:
+        % save both images as mat:
         save([file_name '.mat'], 'image_to_save', '-v7.3');
         save([file_name_small '.mat'], 'image_to_save_small', '-v7.3');
             
