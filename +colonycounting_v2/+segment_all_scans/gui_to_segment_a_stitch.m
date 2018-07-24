@@ -53,7 +53,7 @@ function boundaries = gui_to_segment_a_stitch(stitch, boundaries, instructions)
     function view_image
         
         % display the image:
-        imshow(stitch, 'Parent', handles.image);
+        imshow(scale(stitch), 'Parent', handles.image);
         
         % plot boundaries:
         plot_boundaries;
