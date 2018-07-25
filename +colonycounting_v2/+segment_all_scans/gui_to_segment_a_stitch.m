@@ -3,6 +3,10 @@ function boundaries = gui_to_segment_a_stitch(stitch, boundaries, instructions)
     % create GUI:
     handles = create_GUI;
     
+    % set default thresholds to use:
+    threshold_min = 0.0;
+    threshold_max = 1.0;
+    
     % view image:
     view_image;
 
@@ -11,40 +15,66 @@ function boundaries = gui_to_segment_a_stitch(stitch, boundaries, instructions)
         
         % create figure:
         handles.figure = figure('Units', 'pixels', ...
-            'Position', [0 0 500 630]);
+            'Position', [0 0 500 600]);
         
         % move gui to the center of the screen:
         movegui(handles.figure, 'center');
         
         % add image:
         handles.image = axes('Units', 'pixels', ...
-            'Position', [10 10 480 480]);
+            'Position', [30 10 440 440]);
+        
+        % add text to label lower contrast slider:
+        handles.contrast_lower_text = uicontrol('Style', 'text', ...
+            'Units', 'pixels', ...
+            'Position', [10 460 480 15], ...
+            'String', 'lower threshold');
+        
+        % add text to label upper contrast slider:
+        handles.contrast_upper_text = uicontrol('Style', 'text', ...
+            'Units', 'pixels', ...
+            'Position', [10 495 480 15], ...
+            'String', 'upper threshold');
+        
+        % add button to adjust lower end of contrast:
+        handles.contrast_lower = uicontrol('Style', 'slider', ...
+            'Units', 'pixels', ...
+            'Position', [10 460 480 25], ...
+            'Callback', @callback_contrast_lower, ...
+            'min', 0, 'max', 1, 'Value', 0);
+        
+        % add button to adjust upper end of contrast:
+        handles.contrast_upper = uicontrol('Style', 'slider', ...
+            'Units', 'pixels', ...
+            'Position', [10 495 480 25], ...
+            'Callback', @callback_contrast_upper, ...
+            'min', 0, 'max', 1, 'Value', 1);
         
         % add button to add a segmentation:
         handles.add = uicontrol('Style', 'pushbutton', ...
             'Units', 'pixels', ...
-            'Position', [10 500 235 50], ...
+            'Position', [10 530 235 25], ...
             'String', 'Add Segmentation', ...
             'Callback', @callback_add);
         
         % add button to delete a segmentation:
         handles.delete = uicontrol('Style', 'pushbutton', ...
             'Units', 'pixels', ...
-            'Position', [255 500 235 50], ...
+            'Position', [255 530 235 25], ...
             'String', 'Delete Segmentation', ...
             'Callback', @callback_delete);
         
         % add button to be done:
         handles.done = uicontrol('Style', 'pushbutton', ...
             'Units', 'pixels', ...
-            'Position', [255 560 235 50], ...
+            'Position', [255 565 235 25], ...
             'String', 'Done', ...
             'Callback', @callback_done);
         
         % add instructions:
         uicontrol('Style', 'text', ...
             'Units', 'pixels', ...
-            'Position', [10 560 235 50], ...
+            'Position', [10 565 235 25], ...
             'String', instructions);
         
     end
@@ -53,7 +83,7 @@ function boundaries = gui_to_segment_a_stitch(stitch, boundaries, instructions)
     function view_image
         
         % display the image:
-        imshow(scale(stitch), 'Parent', handles.image);
+        imshow(imadjust(stitch, [threshold_min, threshold_max]), 'Parent', handles.image);
         
         % plot boundaries:
         plot_boundaries;
@@ -91,6 +121,28 @@ function boundaries = gui_to_segment_a_stitch(stitch, boundaries, instructions)
         
         % turn off the hold:
         hold(handles.image, 'off'); 
+        
+    end
+
+    % function to adjust lower bound of contrast:
+    function callback_contrast_lower(~,~)
+        
+        % get the slider value:
+        threshold_min = get(handles.contrast_lower, 'Value');
+        
+        % show the image:
+        view_image
+        
+    end
+
+    % function to adjust upper bound of contrast:
+    function callback_contrast_upper(~,~)
+        
+        % get the slider value:
+        threshold_max = get(handles.contrast_upper, 'Value');
+        
+        % show the image:
+        view_image;
         
     end
 
