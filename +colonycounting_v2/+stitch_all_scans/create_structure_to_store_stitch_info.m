@@ -5,7 +5,7 @@ function stitch_info = create_structure_to_store_stitch_info(paths)
 
     % create structure to store stitch info:
     [stitch_info(1:num_folders).path_folder] = deal('');
-    [stitch_info(1:num_folders).scans] = deal(struct);
+    [stitch_info(1:num_folders).scan_info] = deal(struct);
 
     % for each folder:
     for i = 1:num_folders
@@ -24,9 +24,9 @@ function stitch_info = create_structure_to_store_stitch_info(paths)
         num_scans = numel(list_scan_names);
         
         % create structure to store scans:
-        [scans(1:num_scans).path_folder] = deal('');
-        [scans(1:num_scans).name_scan] = deal('');
-        [scans(1:num_scans).images] = deal(struct);
+        [scan_info(1:num_scans).path_folder] = deal('');
+        [scan_info(1:num_scans).name_scan] = deal('');
+        [scan_info(1:num_scans).images] = deal(struct);
 
         % for each scan:
         for j = 1:num_scans
@@ -67,15 +67,15 @@ function stitch_info = create_structure_to_store_stitch_info(paths)
             end
       
             % save:
-            scans(j).path_folder = path_folder;
-            scans(j).name_scan = name_scan;
-            scans(j).images = images;
+            scan_info(j).path_folder = path_folder;
+            scan_info(j).name_scan = name_scan;
+            scan_info(j).images = images;
             
         end
 
         % save:
         stitch_info(i).path_folder = path_folder;
-        stitch_info(i).scans = scans;
+        stitch_info(i).scan_info = scan_info;
         
     end
 

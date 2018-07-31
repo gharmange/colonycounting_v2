@@ -34,7 +34,12 @@ function stitch_all_scans(varargin)
     
     %%% Next, we need get the amount to shift the images by. 
     
-    stitch_info = colonycounting_v2.stitch_all_scans.get_shifts(stitch_info);
+    stitch_info = colonycounting_v2.stitch_all_scans.get_shifts_to_align(stitch_info);
+    
+    %%% Next, we need to set up the coordinates needed to stitch the
+    %%% images.
+    
+    stitch_info = colonycounting_v2.stitch_all_scans.get_stitch_coordinates(stitch_info);
     
     %%% Next, we need to create the stitched images. 
     

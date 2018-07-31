@@ -25,32 +25,33 @@ function stitch_info = get_scan_dimensions(stitch_info)
         end
         
         % for each scan:
-        for j = 1:numel(stitch_info(i).scans)
+        for j = 1:numel(stitch_info(i).scan_info)
            
             % if no scans have the same sizes:
             if strcmp(answer, 'No, none do.')
 
                 % get channel names:
-                [num_rows, num_columns] = colonycounting_v2.stitch_all_scans.get_scan_dimensions.enter_scan_dimensions(stitch_info(i).path_folder, stitch_info(i).scans(j).name_scan);
+                [num_rows, num_columns] = colonycounting_v2.stitch_all_scans.get_scan_dimensions.enter_scan_dimensions(stitch_info(i).path_folder, stitch_info(i).scan_info(j).name_scan);
 
             end
             
             % save:
-            stitch_info(i).scans(j).num_tiles_row = num_rows;
-            stitch_info(i).scans(j).num_tiles_column = num_columns;
+            stitch_info(i).scan_info(j).num_tiles_row = num_rows;
+            stitch_info(i).scan_info(j).num_tiles_column = num_columns;
+            stitch_info(i).scan_info(j).num_tiles = num_rows * num_columns;
             
             % for each wavelength:
-            for k = 1:numel(stitch_info(i).scans(j).images)
+            for k = 1:numel(stitch_info(i).scan_info(j).images)
                 
                 % get list of images for the wavelength:
-                list_images = stitch_info(i).scans(j).images(k).list_images;
+                list_images = stitch_info(i).scan_info(j).images(k).list_images;
                 
                 % remove the Metamorph stitched image from the list of images:
                 [~, rows_to_remove] = colonycounting_v2.utilities.get_structure_results_containing_string(list_images, 'name', num2str((num_rows*num_columns) + 1));
                 list_images(rows_to_remove) = [];
 
                 % save to stitch info structure:
-                stitch_info(i).scans(j).images(k).list_images = list_images;
+                stitch_info(i).scan_info(j).images(k).list_images = list_images;
                 
             end
             

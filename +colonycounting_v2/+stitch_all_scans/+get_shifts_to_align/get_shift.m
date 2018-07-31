@@ -1,4 +1,4 @@
-function [shift_column, shift_row] = get_shift(images, num_rows, num_columns, folder, name_scan)
+function [shift_column, shift_row, image_size] = get_shift(images, num_rows, num_columns, folder, name_scan)
 
     % if there is only one wavelength:
     if numel(images) == 1
@@ -51,6 +51,9 @@ function [shift_column, shift_row] = get_shift(images, num_rows, num_columns, fo
     image_below = image_below.imagedata;
     image_right = readmm(fullfile(image_info_right(1).folder, image_info_right(1).name));
     image_right = image_right.imagedata;
+
+    % get image size:
+    image_size = size(image_middle, 1);
     
     % scale images and convert to double:
     image_middle = double(scale(image_middle));
@@ -58,8 +61,9 @@ function [shift_column, shift_row] = get_shift(images, num_rows, num_columns, fo
     image_right = double(scale(image_right));
     
     % display images:
+    image_display = [image_middle, image_right; image_below zeros(size(image_middle), 'like', image_middle)];
     handle_display = figure;
-    imshow([image_middle, image_below, image_right]);
+    imshow(image_display);
     
     % ask user how they want to align them
     type_alignment = questdlg('Do you want to align the images visually or enter an overlap?', 'Alignment', 'Visually', 'Enter an Overlap', 'Visually');
@@ -73,15 +77,15 @@ function [shift_column, shift_row] = get_shift(images, num_rows, num_columns, fo
         case 'Visually'
             
             % get column shift distances:
-            shift_column = colonycounting_v2.stitch_all_scans.get_shifts.get_shift_visually(image_middle, image_below);
+            shift_column = colonycounting_v2.stitch_all_scans.get_shifts_to_align.get_shift_visually(image_middle, image_below);
             
             % get row shift distances:
-            shift_row = colonycounting_v2.stitch_all_scans.get_shifts.get_shift_visually(image_middle, image_right);
+            shift_row = colonycounting_v2.stitch_all_scans.get_shifts_to_align.get_shift_visually(image_middle, image_right);
             
         case 'Enter an Overlap'
             
             % get coordinates:
-            [shift_column, shift_row] = colonycounting_v2.stitch_all_scans.get_shifts.get_shift_overlap(folder, name_scan);
+            [shift_column, shift_row] = colonycounting_v2.stitch_all_scans.get_shifts_to_align.get_shift_overlap(folder, name_scan);
             
             % adjust shift distances so that they have the same axes as
             % those set visually:

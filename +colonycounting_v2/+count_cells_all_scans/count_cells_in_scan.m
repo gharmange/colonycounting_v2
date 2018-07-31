@@ -1,36 +1,63 @@
-function centroids_formatted = count_cells_in_scan(image)
+function [cells_position, cells_stitch, cells_stitch_small] = count_cells_in_scan(list_images, stitch_coords, scale_rows, scale_columns)
 
-    % get the ATrous Wavelet Transform of the image:
-    [transform, ~] = aTrousWaveletTransform(image, 'numLevels', 3, 'sigma', 3);
-    
-    % use the last level of the transform and scale it to 0 and max intensity:
-    transform = scale(transform(:,:,3));
-    
-    % binarize the transform to 0s and 1s:
-    transform_binary = imbinarize(transform,graythresh(transform));
+    % get number of images:
+    num_images = numel(list_images);
 
-    % get the connected components (objects):
-    objects = bwconncomp(transform_binary);
+    % create structure to store centroids:
+    [cells_position(1:num_images).image_name] = deal('');
+    [cells_position(1:num_images).coords] = deal([]);
+
+    % create array to store centroids for the entire stitch:
+    cells_stitch = [];
     
-    % get the centroids of the objects::
-    centroids = regionprops(objects,'Centroid');
-    
-    % get number of centroids:
-    num_centroids = numel(centroids);
-    
-    % create empty array to store formatted centroids:
-    centroids_formatted = zeros(num_centroids, 2);
-    
-    % for every centroid:
-    for i = 1:num_centroids
+    % for each image:
+    for i = 1:num_images
+       
+        % get the image name:
+        image_name = list_images(i).name;
         
-        % get coordinates and round to whole number:
-        col = round(centroids(i).Centroid(2)); 
-        row = round(centroids(i).Centroid(1));
+        % load the image:
+        image = readmm(fullfile(list_images(i).folder, image_name));
+        image = image.imagedata;
         
-        % add to centroids array:
-        centroids_formatted(i,:) = [row, col];
+        % count the cells in the image:
+        coords = colonycounting_v2.count_cells_all_scans.count_cells_in_scan.count_cells_in_image(image);
+        
+        % get position number of the image:
+        position_number = str2double(image_name(strfind(image_name, 's')+1:strfind(image_name, 't')-2));
+
+        % get the stitch coords for the image:
+        stitch_coords_image = colonycounting_v2.utilities.get_structure_results_matching_number(stitch_coords, 'position_num_linear', position_number);
+
+        % if the image has an image that overlaps to the left:
+        if ~strcmp(stitch_coords_image.overlap_left.stitch, 'none')
+
+            coords = colonycounting_v2.count_cells_all_scans.count_cells_in_scan.remove_cells_in_overlap(coords, stitch_coords_image.overlap_left.position);
+
+        end
+        
+        % if the image has an image that overlaps above:
+        if ~strcmp(stitch_coords_image.overlap_above.stitch, 'none')
+
+            coords = colonycounting_v2.count_cells_all_scans.count_cells_in_scan.remove_cells_in_overlap(coords, stitch_coords_image.overlap_above.position);
+
+        end
+        
+        % convert coords to reference frame of the stitch:
+        coords_stitch_position = zeros(size(coords));
+        coords_stitch_position(:,2) = coords(:,2) + stitch_coords_image.corner_ul_row;
+        coords_stitch_position(:,1) = coords(:,1) + stitch_coords_image.corner_ul_column;
+        
+        % save:
+        cells_position(i).image_name = image_name;
+        cells_position(i).coords = coords;
+        cells_stitch = [cells_stitch; coords_stitch_position];
         
     end
+
+    % convert the cell centroids to the reference frame of the small
+    % stitch:
+    cells_stitch_small(:,2) = round(cells_stitch(:,2) / scale_rows);
+    cells_stitch_small(:,1) = round(cells_stitch(:,1) / scale_columns);
 
 end

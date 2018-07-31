@@ -43,36 +43,31 @@ function count_cells_all_scans(varargin)
             stitch = colonycounting_v2.utilities.load_structure_from_file(fullfile(path_scan, [name_stitch '.mat']));
             
             % load the boundaries:
-            boundaries = colonycounting_v2.utilities.load_structure_from_file(fullfile(path_scan, sprintf('boundaries_%s.mat', stitch_info.name_scan)));
+            boundaries = colonycounting_v2.utilities.load_structure_from_file(fullfile(path_scan, sprintf('Segmentation_%s.mat', stitch_info.name_scan)));
             
-            % get boundary coords in reference frame of original stitch:
-            boundaries = colonycounting_v2.count_cells_all_scans.scale_coords_boundary_up(boundaries, stitch_info.scale_rows, stitch_info.scale_columns);
+            % get the list of DAPI images (for counting cells):
+            list_images = colonycounting_v2.utilities.get_structure_results_matching_string(stitch_info(i).images, 'channel', 'dapi');
+            list_images = list_images.list_images;
             
             % count the cells:
-            centroids.all.coordinates_original = colonycounting_v2.count_cells_all_scans.count_cells_in_scan(stitch);
-            
-            % get centroid coords in reference frame of small stitch:
-            centroids.all.coordinates_small = colonycounting_v2.utilities.scale_coords(centroids.all.coordinates_original, (1/stitch_info.scale_rows), (1/stitch_info.scale_columns));    
+            [cells.all.position, cells.all.stitch, cells.all.stitch_small] = colonycounting_v2.count_cells_all_scans.count_cells_in_scan(list_images, stitch_info(i).stitch_coords, stitch_info.scale_rows, stitch_info.scale_columns);
 
-            % determine centroids in the well/colonies:
-            boundaries.well = colonycounting_v2.count_cells_all_scans.get_cells_within_boundaries(centroids, boundaries.well);
-            boundaries.colonies = colonycounting_v2.count_cells_all_scans.get_cells_within_boundaries(centroids, boundaries.colonies);
+            % determine cells in the well/colonies:
+            cells.well = colonycounting_v2.count_cells_all_scans.get_cells_within_boundaries(cells, boundaries.well);
+            cells.colonies = colonycounting_v2.count_cells_all_scans.get_cells_within_boundaries(cells, boundaries.colonies);
             
             % create image with the cells and boundaries plotted:
-            stitch_annotated = colonycounting_v2.count_cells_all_scans.add_all_boundaries_and_cells_to_stitch(stitch, centroids, boundaries);
+            stitch_annotated = colonycounting_v2.count_cells_all_scans.add_all_boundaries_and_cells_to_stitch(stitch, cells);
             
             % create downsized version of annotated image:
-            stitch_annotated_small = imresize(stitch_annotated, [size(stitch_annotated, 1)/stitch_info.scale_rows, size(stitch_annotated, 2)/stitch_info.scale_columns]);
+            stitch_small_annotated = imresize(stitch_annotated, [size(stitch_annotated, 1)/stitch_info.scale_rows, size(stitch_annotated, 2)/stitch_info.scale_columns]);
             
-            % save centroids and boundaries:
-            save(fullfile(path_scan, sprintf('cell_centroids_%s.mat', stitch_info.name_scan)), 'centroids');
-            save(fullfile(path_scan, sprintf('boundaries_cell_centroids_%s.mat', stitch_info.name_scan)), 'boundaries');
+            % save cells:
+            save(fullfile(path_scan, sprintf('Segmentation_and_Cells_%s.mat', stitch_info.name_scan)), 'cells');
             
             % save annotated stitched image:
             save(fullfile(path_scan, sprintf('%s_segmentation_cells.mat', name_stitch)), 'stitch_annotated');
-            
-            % save small annotated stitched image:
-            imwrite(stitch_annotated_small, fullfile(path_scan, sprintf('%s_small_segmentation_cells.tif', name_stitch)));
+            imwrite(stitch_small_annotated, fullfile(path_scan, sprintf('%s_small_segmentation_cells.tif', name_stitch)));
             
         end
         

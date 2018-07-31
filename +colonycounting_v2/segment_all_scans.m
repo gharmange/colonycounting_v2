@@ -37,10 +37,11 @@ function segment_all_scans(varargin)
             name_stitch = sprintf('Stitch_%s_%s_small', stitch_info.name_scan, 'dapi');
             
             % load the stitch:
-            stitch = colonycounting_v2.utilities.load_structure_from_file(fullfile(path_scan, [name_stitch '.mat']));
+            stitch = readmm(fullfile(path_scan, [name_stitch '.tif']));
+            stitch = stitch.imagedata;
             
             % get name and path for file to store boundaries:
-            file_name_boundaries = sprintf('boundaries_%s.mat', stitch_info.name_scan);
+            file_name_boundaries = sprintf('Segmentation_%s.mat', stitch_info.name_scan);
             
             % check for existence of boundaries file:
             if exist(fullfile(path_scan, file_name_boundaries), 'file') == 2
@@ -73,9 +74,12 @@ function segment_all_scans(varargin)
             instructions_colonies = 'Segment the colonies.';
             boundaries_colonies = colonycounting_v2.segment_all_scans.gui_to_segment_a_stitch(stitch, boundaries_colonies, instructions_colonies);
 
-            % make annotated stitch:
+            % get boundary coords in reference frame of original stitch:
             boundaries.well = boundaries_well;
             boundaries.colonies = boundaries_colonies;
+            boundaries = colonycounting_v2.segment_all_scans.scale_coords_boundary_up(boundaries, stitch_info.scale_rows, stitch_info.scale_columns);
+            
+            % make annotated stitch:
             stitch_annotated = colonycounting_v2.segment_all_scans.add_all_boundaries_to_stitch(stitch, boundaries);
             
             % save boundaries:

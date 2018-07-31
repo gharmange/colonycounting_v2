@@ -1,24 +1,33 @@
-function boundaries = get_cells_within_boundaries(centroids, boundaries)
+function cells_and_boundaries = get_cells_within_boundaries(cells, boundaries)
 
     % get number of boundaries:
     num_boundaries = numel(boundaries);
     
-    % add field to store centroids within each boundary:
-    [boundaries(1:num_boundaries).centroids] = deal(struct);
+    % create structure to store cells and boundaries:
+    [cells_and_boundaries(1:num_boundaries).boundary_stitch] = deal([]);
+    [cells_and_boundaries(1:num_boundaries).boundary_stitch_small] = deal([]);
+    [cells_and_boundaries(1:num_boundaries).cells_stitch] = deal([]);
+    [cells_and_boundaries(1:num_boundaries).cells_stitch_small] = deal([]);
     
     % for each boundary:
     for i = 1:num_boundaries
 
-        % get row indices of centroids that overlap with the object mask:
-        centroid_row = centroids.all.coordinates_original(:,1);
-        centroid_col = centroids.all.coordinates_original(:,2);
+        % get boundary coordinates:
         boundary_row = boundaries(i).coordinates_boundary_original(:,1);
         boundary_col = boundaries(i).coordinates_boundary_original(:,2);
-        rows = inpolygon(centroid_col, centroid_row, boundary_col, boundary_row);
+        
+        % get cell coordinates:
+        cells_row = cells.all.stitch(:,1);
+        cells_col = cells.all.stitch(:,2);
+        
+        % get row indices of cells that fall within the boundary:
+        rows = inpolygon(cells_col, cells_row, boundary_col, boundary_row);
 
         % save centroids that overlap with object:
-        boundaries(i).centroids.coordinates_original = centroids.all.coordinates_original(rows, :);
-        boundaries(i).centroids.coordinates_small = centroids.all.coordinates_small(rows, :);
+        cells_and_boundaries(i).boundary_stitch = boundaries(i).coordinates_boundary_original;
+        cells_and_boundaries(i).boundary_stitch_small = boundaries(i).coordinates_boundary_small;
+        cells_and_boundaries(i).cells_stitch = cells.all.stitch(rows, :);
+        cells_and_boundaries(i).cells_stitch_small = cells.all.stitch_small(rows, :);
         
     end
 
