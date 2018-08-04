@@ -21,17 +21,45 @@ function [shift_column, shift_row, image_size] = get_shift(images, num_rows, num
     % arrange position numbers into matrix (same order that scope acquires images):
     matrix_of_positions = reshape(array_of_positions, num_rows, num_columns);
     
-    % get the tile number of the middle image of the scan:
-    tile_row_middle = round(num_rows/2);
-    tile_column_middle = round(num_columns/2);
-    
-    % get the position number of the middle image of the scan:
+    % ask user if they would like to input position to use for alignment.
+    question = 'Would you like to specify an image to use for visual alignment?';
+    title = 'Scan Alignment';
+    answer = questdlg(question, title, 'Yes.', 'No. Just use the default.', 'No. I will enter an overlap manually', 'No. Just use the default.');
+
+    switch answer
+        case 'Yes.'
+            % get the users desired image position
+            prompt = [{sprintf('Entor row (1-%d)', num_rows)}, {sprintf('Entor column (1-%d)', num_columns)}];
+            title = 'Which image would you like to use for alignment?';
+            position = inputdlg(prompt, title, [1 50]);
+            position = str2double(position);
+            
+            %Make sure the position is in range of the scan. 
+            if all(position > 1 & position(1) <= num_rows & position(2) <= num_columns) 
+                tile_row_middle = position(1);
+                tile_column_middle = position(2); 
+            % if not, use the default middle position of the scan
+            else
+                tile_row_middle = round(num_rows/2);
+                tile_column_middle = round(num_columns/2); 
+            end
+            
+        case 'No. Just use the default.'
+            tile_row_middle = round(num_rows/2);
+            tile_column_middle = round(num_columns/2);
+        
+        case 'No. I will enter an overlap manually'
+            tile_row_middle = round(num_rows/2);
+            tile_column_middle = round(num_columns/2);
+    end
+   
+    % get the position of the images used to calculate overlap
     position_num_middle = matrix_of_positions(tile_row_middle, tile_column_middle);
     
-    % get the position number of the image below the middle of the scan:
+    % get the position of the image below:
     position_num_below = matrix_of_positions(tile_row_middle + 1, tile_column_middle);
     
-    % get the position number of the image right the middle of the scan:
+    % get the position of the image right:
     position_num_right = matrix_of_positions(tile_row_middle, tile_column_middle + 1);
     
     % convert position numbers to strings:
