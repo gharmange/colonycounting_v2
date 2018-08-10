@@ -1,10 +1,10 @@
 function boundaries = scale_coords_boundary_up(boundaries, scale_rows, scale_columns)
     
     % scale well boundaries:
-    boundaries.well = scale_coords_boundary(boundaries.well, scale_rows, scale_columns);
+    boundaries.original.well = scale_coords_boundary(boundaries.small.well, scale_rows, scale_columns);
     
     % scale colony boundaries:
-    boundaries.colonies = scale_coords_boundary(boundaries.colonies, scale_rows, scale_columns);
+    boundaries.original.colonies = scale_coords_boundary(boundaries.small.colonies, scale_rows, scale_columns);
 
 end
 

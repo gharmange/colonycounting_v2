@@ -173,6 +173,8 @@ function boundaries = gui_to_segment_a_stitch(stitch, boundaries, instructions)
         mask = poly2mask(temp.coordinates_boundary_small(:,1), temp.coordinates_boundary_small(:,2), size(stitch, 1), size(stitch, 2));
         [temp.coordinates_mask_small(:,1), temp.coordinates_mask_small(:,2)] = find(mask == 1);
 
+%         hi = boundaries;
+        
         % save coords:
         boundaries = colonycounting_v2.utilities.add_entry_to_structure(temp, boundaries);
 

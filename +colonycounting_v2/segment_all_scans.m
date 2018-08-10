@@ -48,35 +48,35 @@ function segment_all_scans(varargin)
                 
                 % load the boundaries:
                 boundaries = colonycounting_v2.utilities.load_structure_from_file(fullfile(path_scan, file_name_boundaries));
-                boundaries_well = boundaries.well;
-                boundaries_colonies = boundaries.colonies;
+                boundaries_small_well = boundaries.small.well;
+                boundaries_small_colonies = boundaries.small.colonies;
                 
             % if the boundaries file does not already exist:
             else
                 
                 % create structure to store boundaries:
-                boundaries_well = struct;
-                boundaries_well.coordinates_boundary_small = [];
-                boundaries_well.coordinates_mask_small = [];
-                boundaries_well.status = '';
-                boundaries_colonies = struct;
-                boundaries_colonies.coordinates_boundary_small = [];
-                boundaries_colonies.coordinates_mask_small = [];
-                boundaries_colonies.status = '';
+                boundaries_small_well = struct;
+                boundaries_small_well.coordinates_boundary_small = [];
+                boundaries_small_well.coordinates_mask_small = [];
+                boundaries_small_well.status = '';
+                boundaries_small_colonies = struct;
+                boundaries_small_colonies.coordinates_boundary_small = [];
+                boundaries_small_colonies.coordinates_mask_small = [];
+                boundaries_small_colonies.status = '';
                 
             end
             
             % segment the well:
             instructions_well = 'Segment the well.';
-            boundaries_well = colonycounting_v2.segment_all_scans.gui_to_segment_a_stitch(stitch, boundaries_well, instructions_well);
+            boundaries_small_well = colonycounting_v2.segment_all_scans.gui_to_segment_a_stitch(stitch, boundaries_small_well, instructions_well);
             
             % segment the colonies:
             instructions_colonies = 'Segment the colonies.';
-            boundaries_colonies = colonycounting_v2.segment_all_scans.gui_to_segment_a_stitch(stitch, boundaries_colonies, instructions_colonies);
+            boundaries_small_colonies = colonycounting_v2.segment_all_scans.gui_to_segment_a_stitch(stitch, boundaries_small_colonies, instructions_colonies);
 
             % get boundary coords in reference frame of original stitch:
-            boundaries.well = boundaries_well;
-            boundaries.colonies = boundaries_colonies;
+            boundaries.small.well = boundaries_small_well;
+            boundaries.small.colonies = boundaries_small_colonies;
             boundaries = colonycounting_v2.segment_all_scans.scale_coords_boundary_up(boundaries, stitch_info.scale_rows, stitch_info.scale_columns);
             
             % make annotated stitch:

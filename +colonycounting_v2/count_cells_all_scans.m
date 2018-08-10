@@ -53,8 +53,8 @@ function count_cells_all_scans(varargin)
             [cells.all.position, cells.all.stitch, cells.all.stitch_small] = colonycounting_v2.count_cells_all_scans.count_cells_in_scan(list_images, stitch_info(i).stitch_coords, stitch_info.scale_rows, stitch_info.scale_columns);
 
             % determine cells in the well/colonies:
-            cells.well = colonycounting_v2.count_cells_all_scans.get_cells_within_boundaries(cells, boundaries.well);
-            cells.colonies = colonycounting_v2.count_cells_all_scans.get_cells_within_boundaries(cells, boundaries.colonies);
+            cells.well = colonycounting_v2.count_cells_all_scans.get_cells_within_boundaries(cells, boundaries.original.well);
+            cells.colonies = colonycounting_v2.count_cells_all_scans.get_cells_within_boundaries(cells, boundaries.original.colonies);
             
             % create image with the cells and boundaries plotted:
             stitch_annotated = colonycounting_v2.count_cells_all_scans.add_all_boundaries_and_cells_to_stitch(stitch, cells);
