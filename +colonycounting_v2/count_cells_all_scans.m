@@ -33,41 +33,37 @@ function count_cells_all_scans(varargin)
             % load the stitch info:
             stitch_info = colonycounting_v2.utilities.load_structure_from_file(fullfile(path_scan, list_stitch_info(j).name));
             
+            % get the name of the scan:
+            name_scan = stitch_info.name_scan;
+            
             % get the name of the dapi stitch:
-            name_stitch = sprintf('Stitch_%s_%s', stitch_info.name_scan, 'dapi');
-            
-            % display status:
-            colonycounting_v2.utilities.display_status('Counting cells in', name_stitch, path_scan);
-            
-            % load the stitch:
-            stitch = colonycounting_v2.utilities.load_structure_from_file(fullfile(path_scan, [name_stitch '.mat']));
-            
-            % load the boundaries:
-            boundaries = colonycounting_v2.utilities.load_structure_from_file(fullfile(path_scan, sprintf('Segmentation_%s.mat', stitch_info.name_scan)));
+            name_stitch = sprintf('Stitch_Original_%s_%s', name_scan, 'dapi');
             
             % get the list of DAPI images (for counting cells):
             list_images = colonycounting_v2.utilities.get_structure_results_matching_string(stitch_info(i).images, 'channel', 'dapi');
             list_images = list_images.list_images;
             
+            % display status:
+            colonycounting_v2.utilities.display_status('Counting cells in', name_stitch, path_scan);
+            
             % count the cells:
             [cells.all.position, cells.all.stitch, cells.all.stitch_small] = colonycounting_v2.count_cells_all_scans.count_cells_in_scan(list_images, stitch_info(i).stitch_coords, stitch_info.scale_rows, stitch_info.scale_columns);
-
-            % determine cells in the well/colonies:
-            cells.well = colonycounting_v2.count_cells_all_scans.get_cells_within_boundaries(cells, boundaries.original.well);
-            cells.colonies = colonycounting_v2.count_cells_all_scans.get_cells_within_boundaries(cells, boundaries.original.colonies);
             
-            % create image with the cells and boundaries plotted:
-            stitch_annotated = colonycounting_v2.count_cells_all_scans.add_all_boundaries_and_cells_to_stitch(stitch, cells);
+            % load the stitch:
+            stitch = colonycounting_v2.utilities.load_structure_from_file(fullfile(path_scan, [name_stitch '.mat']));
             
-            % create downsized version of annotated image:
+            % overlay on stitch:
+            stitch_annotated = colonycounting_v2.count_cells_all_scans.overlay_on_image(stitch, cells);
+            
+            % create downsized version of annotated stitch:
             stitch_small_annotated = imresize(stitch_annotated, [size(stitch_annotated, 1)/stitch_info.scale_rows, size(stitch_annotated, 2)/stitch_info.scale_columns]);
             
             % save cells:
-            save(fullfile(path_scan, sprintf('Segmentation_and_Cells_%s.mat', stitch_info.name_scan)), 'cells');
+            save(fullfile(path_scan, sprintf('Cell_Info_%s.mat', stitch_info.name_scan)), 'cells');
             
             % save annotated stitched image:
-            save(fullfile(path_scan, sprintf('%s_segmentation_cells.mat', name_stitch)), 'stitch_annotated');
-            imwrite(stitch_small_annotated, fullfile(path_scan, sprintf('%s_small_segmentation_cells.tif', name_stitch)));
+            save(fullfile(path_scan, sprintf('Cell_Original_%s.mat', name_scan)), 'stitch_annotated');
+            imwrite(stitch_small_annotated, fullfile(path_scan, sprintf('Cell_Small_%s.tif', name_scan)));
             
         end
         

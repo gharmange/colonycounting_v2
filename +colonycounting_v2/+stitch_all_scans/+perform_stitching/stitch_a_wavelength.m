@@ -48,7 +48,7 @@ function stitch_a_wavelength(scan, images)
 
     end
 
-    % create a downsized version of the image:
+    % create a downsized version of the stitch:
     image_stitched_small = imresize(image_stitched, [image_size image_size]);
 
     % get the scale factor:
@@ -56,18 +56,18 @@ function stitch_a_wavelength(scan, images)
     scan.scale_columns = size(image_stitched, 2) / image_size;
 
     % set file name:
-    file_name = fullfile(scan.path_folder, sprintf('Stitch_%s_%s', scan.name_scan, images.channel));
-    file_name_small = fullfile(scan.path_folder, sprintf('Stitch_%s_%s_small', scan.name_scan, images.channel));
+    file_name = fullfile(scan.path_folder, sprintf('Stitch_Original_%s_%s.mat', scan.name_scan, images.channel));
+    file_name_small = fullfile(scan.path_folder, sprintf('Stitch_Small_%s_%s.tif', scan.name_scan, images.channel));
 
     % set images to save:
     image_to_save = image_stitched;
     image_to_save_small = image_stitched_small;
 
     % save small image as tif:
-    imwrite(image_to_save_small, [file_name_small '.tif']);
+    imwrite(image_to_save_small, file_name_small);
 
     % save large image as mat:
-    save([file_name '.mat'], 'image_to_save', '-v7.3');
+    save(file_name, 'image_to_save', '-v7.3');
 
     % save stitch info:
     save(fullfile(scan.path_folder, sprintf('Stitch_Info_%s.mat', scan.name_scan)), 'scan');

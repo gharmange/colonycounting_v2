@@ -1,4 +1,4 @@
-function image_annotated = add_all_boundaries_and_cells_to_stitch(image, cells)
+function image_annotated = overlay_on_image(image, cells)
 
     % create rgb-version of image:
     image_annotated = repmat(image, 1, 1, 3);
@@ -15,7 +15,7 @@ function image_annotated = add_all_boundaries_and_cells_to_stitch(image, cells)
     color.cells.all = [1 0 0];
     
     % add cells to image:
-    image_annotated = colonycounting_v2.utilities.add_cell_to_stitch(image_annotated, cells.all.stitch, color.cells.all, marker_size);
+    image_annotated = colonycounting_v2.utilities.add_cells_to_image(image_annotated, cells.all.stitch, color.cells.all, marker_size);
     
     %%% Next, we want to plot the well boundary.
     
@@ -26,7 +26,7 @@ function image_annotated = add_all_boundaries_and_cells_to_stitch(image, cells)
     for i = 1:numel(cells.well)
         
         % add boundary to image:
-        image_annotated = colonycounting_v2.utilities.add_boundary_to_stitch(image_annotated, cells.well(i).boundary_stitch, color.well, marker_size);
+        image_annotated = colonycounting_v2.utilities.add_boundary_to_image(image_annotated, cells.well(i).boundary_stitch, color.well, marker_size);
         
     end
     
@@ -36,7 +36,7 @@ function image_annotated = add_all_boundaries_and_cells_to_stitch(image, cells)
     for i = 1:numel(cells.well)
         
         % add cells to image:
-        image_annotated = colonycounting_v2.utilities.add_cell_to_stitch(image_annotated, cells.well(i).cells_stitch, color.well, marker_size);
+        image_annotated = colonycounting_v2.utilities.add_cells_to_image(image_annotated, cells.well(i).cells_stitch, color.well, marker_size);
     
     end
     
@@ -52,7 +52,7 @@ function image_annotated = add_all_boundaries_and_cells_to_stitch(image, cells)
     for i = 1:num_colonies
         
          % add boundary to image:
-        image_annotated = colonycounting_v2.utilities.add_boundary_to_stitch(image_annotated, cells.colonies(i).boundary_stitch, color.colonies(i, :), marker_size);
+        image_annotated = colonycounting_v2.utilities.add_boundary_to_image(image_annotated, cells.colonies(i).boundary_stitch, color.colonies(i, :), marker_size);
           
     end
     
@@ -62,7 +62,7 @@ function image_annotated = add_all_boundaries_and_cells_to_stitch(image, cells)
     for i = 1:num_colonies
         
         % add cells to image:
-        image_annotated = colonycounting_v2.utilities.add_cell_to_stitch(image_annotated, cells.colonies(i).cells_stitch, color.colonies(i, :), marker_size);
+        image_annotated = colonycounting_v2.utilities.add_cells_to_image(image_annotated, cells.colonies(i).cells_stitch, color.colonies(i, :), marker_size);
    
     end
 

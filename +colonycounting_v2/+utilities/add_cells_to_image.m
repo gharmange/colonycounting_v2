@@ -1,4 +1,4 @@
-function image = add_cell_to_stitch(image, coordinates, color, marker_size)
+function image = add_cells_to_image(image, coordinates, color, marker_size)
 
     % format coordinates:
     coordinates_formatted = coordinates;

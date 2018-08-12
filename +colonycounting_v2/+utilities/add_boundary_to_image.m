@@ -1,4 +1,4 @@
-function image = add_boundary_to_stitch(image, boundary, color, line_width)
+function image = add_boundary_to_image(image, boundary, color, line_width)
 
     % rearrange boundary to format preferred by insertShape:
     boundary_formatted = reshape(boundary', 1, []);
