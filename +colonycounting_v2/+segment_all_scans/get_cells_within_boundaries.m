@@ -1,7 +1,7 @@
 function cells_and_boundaries = get_cells_within_boundaries(cells, boundaries)
 
     % get number of boundaries:
-    num_boundaries = numel(boundaries);
+    num_boundaries = numel(boundaries.stitch_original);
     
     % create structure to store cells and boundaries:
     [cells_and_boundaries(1:num_boundaries).boundary_stitch] = deal([]);
@@ -13,21 +13,21 @@ function cells_and_boundaries = get_cells_within_boundaries(cells, boundaries)
     for i = 1:num_boundaries
 
         % get boundary coordinates:
-        boundary_row = boundaries(i).coordinates_boundary_original(:,1);
-        boundary_col = boundaries(i).coordinates_boundary_original(:,2);
+        boundary_row = boundaries.stitch_original(i).coordinates_boundary(:,1);
+        boundary_col = boundaries.stitch_original(i).coordinates_boundary(:,2);
         
         % get cell coordinates:
-        cells_row = cells.all.stitch(:,1);
-        cells_col = cells.all.stitch(:,2);
+        cells_row = cells.stitch(:,1);
+        cells_col = cells.stitch(:,2);
         
         % get row indices of cells that fall within the boundary:
         rows = inpolygon(cells_col, cells_row, boundary_col, boundary_row);
 
         % save centroids that overlap with object:
-        cells_and_boundaries(i).boundary_stitch = boundaries(i).coordinates_boundary_original;
-        cells_and_boundaries(i).boundary_stitch_small = boundaries(i).coordinates_boundary_small;
-        cells_and_boundaries(i).cells_stitch = cells.all.stitch(rows, :);
-        cells_and_boundaries(i).cells_stitch_small = cells.all.stitch_small(rows, :);
+        cells_and_boundaries(i).boundary_stitch = boundaries.stitch_original(i).coordinates_boundary;
+        cells_and_boundaries(i).boundary_stitch_small = boundaries.stitch_small(i).coordinates_boundary;
+        cells_and_boundaries(i).cells_stitch = cells.stitch(rows, :);
+        cells_and_boundaries(i).cells_stitch_small = cells.stitch_small(rows, :);
         
     end
 

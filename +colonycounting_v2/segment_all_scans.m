@@ -36,6 +36,9 @@ function segment_all_scans(varargin)
             % get the name of the scan:
             name_scan = stitch_info.name_scan;
             
+            % load the cells:
+            cells = colonycounting_v2.utilities.load_structure_from_file(fullfile(path_scan, sprintf('Cell_Info_%s.mat', name_scan)));
+            
             % get the name of the small DAPI stitch:
             name_stitch_small = sprintf('Stitch_Small_%s_%s.tif', name_scan, 'dapi');
             
@@ -51,43 +54,44 @@ function segment_all_scans(varargin)
                 
                 % load the boundaries:
                 boundaries = colonycounting_v2.utilities.load_structure_from_file(fullfile(path_scan, file_name_boundaries));
-                boundaries_small_well = boundaries.small.well;
-                boundaries_small_colonies = boundaries.small.colonies;
                 
             % if the boundaries file does not already exist:
             else
                 
                 % create structure to store boundaries:
-                boundaries_small_well = struct;
-                boundaries_small_well.coordinates_boundary_small = [];
-                boundaries_small_well.coordinates_mask_small = [];
-                boundaries_small_well.status = '';
-                boundaries_small_colonies = struct;
-                boundaries_small_colonies.coordinates_boundary_small = [];
-                boundaries_small_colonies.coordinates_mask_small = [];
-                boundaries_small_colonies.status = '';
+                boundaries = struct;
+                boundaries.well.stitch_original.status = [];
+                boundaries.well.stitch_original.coordinates_boundary = [];
+                boundaries.well.stitch_original.coordinates_mask = [];
+                boundaries.well.stitch_small.status = [];
+                boundaries.well.stitch_small.coordinates_boundary = [];
+                boundaries.well.stitch_small.coordinates_mask = [];
+                boundaries.colonies.stitch_original.status = [];
+                boundaries.colonies.stitch_original.coordinates_boundary = [];
+                boundaries.colonies.stitch_original.coordinates_mask = [];
+                boundaries.colonies.stitch_small.status = [];
+                boundaries.colonies.stitch_small.coordinates_boundary = [];
+                boundaries.colonies.stitch_small.coordinates_mask = [];
+                
+                % guess the colony boundaries: 
+                boundaries.colonies.stitch_small = colonycounting_v2.segment_all_scans.guess_colonies(cells.all.stitch_small, boundaries.colonies.stitch_original, stitch_small);
                 
             end
             
             % segment the well:
             instructions_well = 'Segment the well.';
-            boundaries_small_well = colonycounting_v2.segment_all_scans.gui_to_segment_a_stitch(stitch_small, boundaries_small_well, instructions_well);
+            boundaries.well.stitch_small = colonycounting_v2.segment_all_scans.gui_to_segment_a_stitch(stitch_small, boundaries.well.stitch_small, instructions_well);
             
             % segment the colonies:
             instructions_colonies = 'Segment the colonies.';
-            boundaries_small_colonies = colonycounting_v2.segment_all_scans.gui_to_segment_a_stitch(stitch_small, boundaries_small_colonies, instructions_colonies);
+            boundaries.colonies.stitch_small = colonycounting_v2.segment_all_scans.gui_to_segment_a_stitch(stitch_small, boundaries.colonies.stitch_small, instructions_colonies);
 
             % get boundary coords in reference frame of original stitch:
-            boundaries.small.well = boundaries_small_well;
-            boundaries.small.colonies = boundaries_small_colonies;
             boundaries = colonycounting_v2.segment_all_scans.scale_coords_boundary_up(boundaries, stitch_info.scale_rows, stitch_info.scale_columns);
 
-            % load the cells:
-            cells = colonycounting_v2.utilities.load_structure_from_file(fullfile(path_scan, sprintf('Cell_Info_%s.mat', name_scan)));
-            
             % determine cells in the well/colonies:
-            cells.well = colonycounting_v2.segment_all_scans.get_cells_within_boundaries(cells, boundaries.original.well);
-            cells.colonies = colonycounting_v2.segment_all_scans.get_cells_within_boundaries(cells, boundaries.original.colonies);
+            cells.well = colonycounting_v2.segment_all_scans.get_cells_within_boundaries(cells.all, boundaries.well);
+            cells.colonies = colonycounting_v2.segment_all_scans.get_cells_within_boundaries(cells.all, boundaries.colonies);
             
             % get the name of the original DAPI stitch:
             name_stitch_original = sprintf('Stitch_Original_%s_%s.mat', name_scan, 'dapi');

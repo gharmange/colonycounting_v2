@@ -37,7 +37,13 @@ function count_cells_all_scans(varargin)
             name_scan = stitch_info.name_scan;
             
             % get the name of the dapi stitch:
-            name_stitch = sprintf('Stitch_Original_%s_%s', name_scan, 'dapi');
+            name_stitch = sprintf('Stitch_Original_%s_%s.mat', name_scan, 'dapi');
+            name_stitch_small = sprintf('Stitch_Small_%s_%s.tif', name_scan, 'dapi');
+            
+            % load the stitch:
+            stitch = colonycounting_v2.utilities.load_structure_from_file(fullfile(path_scan, name_stitch));
+            stitch_small = readmm(fullfile(path_scan, name_stitch_small));
+            stitch_small = stitch_small.imagedata;
             
             % get the list of DAPI images (for counting cells):
             list_images = colonycounting_v2.utilities.get_structure_results_matching_string(stitch_info(i).images, 'channel', 'dapi');
@@ -47,10 +53,7 @@ function count_cells_all_scans(varargin)
             colonycounting_v2.utilities.display_status('Counting cells in', name_stitch, path_scan);
             
             % count the cells:
-            [cells.all.position, cells.all.stitch, cells.all.stitch_small] = colonycounting_v2.count_cells_all_scans.count_cells_in_scan(list_images, stitch_info(i).stitch_coords, stitch_info.scale_rows, stitch_info.scale_columns);
-            
-            % load the stitch:
-            stitch = colonycounting_v2.utilities.load_structure_from_file(fullfile(path_scan, [name_stitch '.mat']));
+            [cells.all.position, cells.all.stitch, cells.all.stitch_small] = colonycounting_v2.count_cells_all_scans.count_cells_in_scan(list_images, stitch_info(i).stitch_coords, stitch_info.scale_rows, stitch_info.scale_columns, stitch_small);
             
             % overlay on stitch:
             stitch_annotated = colonycounting_v2.count_cells_all_scans.overlay_on_image(stitch, cells);

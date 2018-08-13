@@ -28,6 +28,10 @@ function centroids_formatted = count_cells_in_image(image)
         col = round(centroids(i).Centroid(1)); 
         row = round(centroids(i).Centroid(2));
         
+        % make sure coordinates fit within image size:
+        col = min(max(col, 1), size(image, 2));
+        row = min(max(row, 1), size(image, 1));
+        
         % add to centroids array:
         centroids_formatted(i,:) = [col, row];
         

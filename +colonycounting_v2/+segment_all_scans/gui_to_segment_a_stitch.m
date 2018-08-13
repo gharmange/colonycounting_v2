@@ -106,7 +106,7 @@ function boundaries = gui_to_segment_a_stitch(stitch, boundaries, instructions)
             if strcmp(boundaries(i).status, 'keep')
                 
                 % get coordinates:
-                temp_coords = boundaries(i).coordinates_boundary_small;
+                temp_coords = boundaries(i).coordinates_boundary;
                 
                 % add first coordinate to end of coordinates (so boundary
                 % plots closed):
@@ -164,14 +164,14 @@ function boundaries = gui_to_segment_a_stitch(stitch, boundaries, instructions)
         temp.status = 'keep';
         
         % get coordinates of boundary:
-        temp.coordinates_boundary_small = getPosition(handle_boundary);
+        temp.coordinates_boundary = getPosition(handle_boundary);
 
         % round boundary coordinates:
-        temp.coordinates_boundary_small = round(temp.coordinates_boundary_small);
+        temp.coordinates_boundary = round(temp.coordinates_boundary);
 
         % convert boundary coordinates to mask coordinates:
-        mask = poly2mask(temp.coordinates_boundary_small(:,1), temp.coordinates_boundary_small(:,2), size(stitch, 1), size(stitch, 2));
-        [temp.coordinates_mask_small(:,1), temp.coordinates_mask_small(:,2)] = find(mask == 1);
+        mask = poly2mask(temp.coordinates_boundary(:,1), temp.coordinates_boundary(:,2), size(stitch, 1), size(stitch, 2));
+        [temp.coordinates_mask(:,1), temp.coordinates_mask(:,2)] = find(mask == 1);
 
         % save coords:
         boundaries = colonycounting_v2.utilities.add_entry_to_structure(temp, boundaries);
@@ -197,7 +197,7 @@ function boundaries = gui_to_segment_a_stitch(stitch, boundaries, instructions)
         for i = 1:numel(boundaries)
 
             % if point falls within mask:
-            if ismember(point, boundaries(i).coordinates_mask_small, 'rows')
+            if ismember(point, boundaries(i).coordinates_mask, 'rows')
 
                 % set that boundaries status to remove:
                 boundaries(i).status = 'remove';

@@ -1,4 +1,4 @@
-function [cells_position, cells_stitch, cells_stitch_small] = count_cells_in_scan(list_images, stitch_coords, scale_rows, scale_columns)
+function [cells_position, cells_stitch, cells_stitch_small] = count_cells_in_scan(list_images, stitch_coords, scale_rows, scale_columns, stitch_small)
 
     % get number of images:
     num_images = numel(list_images);
@@ -59,5 +59,9 @@ function [cells_position, cells_stitch, cells_stitch_small] = count_cells_in_sca
     % stitch:
     cells_stitch_small(:,2) = round(cells_stitch(:,2) / scale_rows);
     cells_stitch_small(:,1) = round(cells_stitch(:,1) / scale_columns);
+    
+    % make sure the coords are within the bounds of the image:
+    cells_stitch_small(:,2) = min(max(cells_stitch_small(:,2), 1), size(stitch_small, 2));
+    cells_stitch_small(:,1) = min(max(cells_stitch_small(:,1), 1), size(stitch_small, 1));
 
 end
