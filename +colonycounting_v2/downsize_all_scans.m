@@ -2,19 +2,7 @@ function downsize_all_scans(varargin)
 
     %%% First, we need to get all the path(s) to the raw images. 
     
-    % if no paths are input:
-    if nargin == 0
-        
-        % set the current working directory as the path to the data:
-        paths = {pwd};
-        
-    % otherwise:
-    else
-        
-        % use the supplied cell as the path(s) to the data:
-        paths = varargin{1};
-        
-    end
+    paths = colonycounting_v2.utilities.get_paths_to_data(varargin);
     
     %%% Next, we want to ask the user by how much to downsize the images. 
     

@@ -27,7 +27,7 @@ function boundaries = get_colony_boundaries(boundaries, cells_x, cells_y, colony
             temp_mask = poly2mask(temp_colony_boundary_x, temp_colony_boundary_y, size(stitch_small, 1), size(stitch_small, 2));
             
             % get coordinates of the mask:
-            [temp_colony_mask_y, temp_colony_mask_x] = find(temp_mask == 1);
+            [temp_colony_mask_x, temp_colony_mask_y] = find(temp_mask == 1);
 
             % save:
             temp.status = 'keep';
