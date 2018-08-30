@@ -3,7 +3,7 @@ function stitch_a_wavelength(scan, images)
     %%% First, we need to load all of the images:
 
     % load an image to get the image dimensions:
-    temp = readmm(fullfile(images.list_images(1).folder, images.list_images(1).name));
+    temp = readmm(fullfile(scan.path_folder, images.list_images(1).name));
     image_size = temp.height;
 
     % get number of positions:

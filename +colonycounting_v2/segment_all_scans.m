@@ -73,16 +73,24 @@
             end
             
             %%% Next, we want the user to complete/review the
-            %%% segmentations. 
+            %%% segmentations. Note that I save the boundaries periodically
+            %%% to minimize the event that errors in the GUI will cause the
+            %%% function to crash (and the user would lose their work).
             
             % segment the well:
             instructions_well = 'Segment the well.';
             boundaries.well.stitch_small = colonycounting_v2.segment_all_scans.gui_to_segment_a_stitch(stitch_small, boundaries.well.stitch_small, instructions_well);
             
+            % save boundaries:
+            save(fullfile(path_scan, file_name_boundaries), 'boundaries');
+            
             % segment the colonies:
             instructions_colonies = 'Segment the colonies.';
             boundaries.colonies.stitch_small = colonycounting_v2.segment_all_scans.gui_to_segment_a_stitch(stitch_small, boundaries.colonies.stitch_small, instructions_colonies);
 
+            % save boundaries:
+            save(fullfile(path_scan, file_name_boundaries), 'boundaries');
+            
             %%% Next, we want to determine the cells in each boundary. 
             
             % get boundary coords in reference frame of original stitch:
@@ -97,14 +105,19 @@
             %%% the SMALL stitch because the necessary MATLAB functions do
             %%% not like very large images. 
             
+            % load already annotated stitch:
+            stitch_small_annotated_old = imread(fullfile(path_scan, sprintf('Segment_Small_%s.tif', name_scan)));
+            
             % overlay on stitch:
-            stitch_small_annotated = colonycounting_v2.segment_all_scans.overlay_on_image(stitch_small, cells);
+%             stitch_small_annotated = colonycounting_v2.segment_all_scans.overlay_on_image(stitch_small, cells);
+            stitch_small_annotated_new = colonycounting_v2.segment_all_scans.overlay_on_image(stitch_small_annotated_old, cells);
             
             % save boundaries:
             save(fullfile(path_scan, file_name_boundaries), 'boundaries');
             
             % save the annotated images:
-            imwrite(stitch_small_annotated, fullfile(path_scan, sprintf('Segment_Small_%s.tif', name_scan)));
+%             imwrite(stitch_small_annotated, fullfile(path_scan, sprintf('Segment_Small_%s.tif', name_scan)));
+            imwrite(stitch_small_annotated_new, fullfile(path_scan, sprintf('Segment_Small_%s_new.tif', name_scan)));
             
         end
         

@@ -1,7 +1,8 @@
 function image_annotated = overlay_on_image(image, cells)
 
     % create rgb-version of image:
-    image_annotated = repmat(image, 1, 1, 3);
+%     image_annotated = repmat(image, 1, 1, 3);
+    image_annotated = image;
     
     % set marker size:
     marker_size = 1;
@@ -11,34 +12,34 @@ function image_annotated = overlay_on_image(image, cells)
     
     %%% Next, we want to plot ALL cells.
     
-    % set color:
-    color.cells.all = [1 1 1];
-    
-    % add cells to image:
-    image_annotated = colonycounting_v2.utilities.add_cells_to_image(image_annotated, cells.all.stitch_small, color.cells.all, marker_size);
-    
-    %%% Next, we want to plot the well boundary.
-    
-    % set color for the well boundary:
-    color.well = [0 0 1];
-    
-    % for each well boundary:
-    for i = 1:numel(cells.well)
-        
-        % add boundary to image:
-        image_annotated = colonycounting_v2.utilities.add_boundary_to_image(image_annotated, cells.well(i).boundary_stitch_small, color.well, marker_size);
-        
-    end
+%     % set color:
+%     color.cells.all = [1 1 1];
+%     
+%     % add cells to image:
+%     image_annotated = colonycounting_v2.utilities.add_cells_to_image(image_annotated, cells.all.stitch_small, color.cells.all, marker_size);
+%     
+%     %%% Next, we want to plot the well boundary.
+%     
+%     % set color for the well boundary:
+%     color.well = [0 0 1];
+%     
+%     % for each well boundary:
+%     for i = 1:numel(cells.well)
+%         
+%         % add boundary to image:
+%         image_annotated = colonycounting_v2.utilities.add_boundary_to_image(image_annotated, cells.well(i).boundary_stitch_small, color.well, marker_size);
+%         
+%     end
     
     %%% Next, we want to plot all cells within the well.
     
-    % for each well:
-    for i = 1:numel(cells.well)
-        
-        % add cells to image:
-        image_annotated = colonycounting_v2.utilities.add_cells_to_image(image_annotated, cells.well(i).cells_stitch_small, color.well, marker_size);
-    
-    end
+%     % for each well:
+%     for i = 1:numel(cells.well)
+%         
+%         % add cells to image:
+%         image_annotated = colonycounting_v2.utilities.add_cells_to_image(image_annotated, cells.well(i).cells_stitch_small, color.well, marker_size);
+%     
+%     end
     
     %%% Next, we want to plot all colony boundaries:
     
@@ -52,18 +53,19 @@ function image_annotated = overlay_on_image(image, cells)
     for i = 1:num_colonies
         
          % add boundary to image:
-        image_annotated = colonycounting_v2.utilities.add_boundary_to_image(image_annotated, cells.colonies(i).boundary_stitch_small, color.colonies(i, :), marker_size);
+%         image_annotated = colonycounting_v2.utilities.add_boundary_to_image(image_annotated, cells.colonies(i).boundary_stitch_small, color.colonies(i, :), marker_size);
+        image_annotated = colonycounting_v2.utilities.add_boundary_to_image(image_annotated, cells.colonies(i).boundary_stitch_small, [1 0 0], marker_size);
           
     end
     
     %%% Next, we want to plot all cells assigned to colonies:
     
-    % for each colony:
-    for i = 1:num_colonies
-        
-        % add cells to image:
-        image_annotated = colonycounting_v2.utilities.add_cells_to_image(image_annotated, cells.colonies(i).cells_stitch_small, color.colonies(i, :), marker_size);
-   
-    end
+%     % for each colony:
+%     for i = 1:num_colonies
+%         
+%         % add cells to image:
+%         image_annotated = colonycounting_v2.utilities.add_cells_to_image(image_annotated, cells.colonies(i).cells_stitch_small, color.colonies(i, :), marker_size);
+%    
+%     end
 
 end

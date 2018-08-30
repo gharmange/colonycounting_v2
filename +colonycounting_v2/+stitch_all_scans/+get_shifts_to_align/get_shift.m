@@ -1,4 +1,4 @@
-function [shift_column, shift_row, image_size] = get_shift(images, num_rows, num_columns, folder, name_scan)
+function [shift_column, shift_row, image_size] = get_shift(images, num_rows, num_columns, path_images, name_folder, name_scan)
 
     % if there is only one wavelength:
     if numel(images) == 1
@@ -21,36 +21,46 @@ function [shift_column, shift_row, image_size] = get_shift(images, num_rows, num
     % arrange position numbers into matrix (same order that scope acquires images):
     matrix_of_positions = reshape(array_of_positions, num_rows, num_columns);
     
+    % get the row and column of the middle position to use for the alignment:
+    tile_row_middle = round(num_rows/2);
+    tile_column_middle = round(num_columns/2);
+    
     % ask user if they would like to input position to use for alignment.
     question = 'Would you like to specify an image to use for visual alignment?';
     title = 'Scan Alignment';
     answer = questdlg(question, title, 'Yes.', 'No. Just use the default.', 'No. I will enter an overlap manually', 'No. Just use the default.');
 
+    % depending on the answer:
     switch answer
+        
+        % if the user wants to enter a position:
         case 'Yes.'
-            % get the users desired image position
+            
+            % get the users desired image position:
             prompt = [{sprintf('Entor row (1-%d)', num_rows)}, {sprintf('Entor column (1-%d)', num_columns)}];
             title = 'Which image would you like to use for alignment?';
             position = inputdlg(prompt, title, [1 50]);
             position = str2double(position);
             
-            %Make sure the position is in range of the scan. 
+            % if the position is in range of the scan: 
             if all(position > 1 & position(1) <= num_rows & position(2) <= num_columns) 
+                
+                % update the position to use for the alignment:
                 tile_row_middle = position(1);
                 tile_column_middle = position(2); 
-            % if not, use the default middle position of the scan
-            else
-                tile_row_middle = round(num_rows/2);
-                tile_column_middle = round(num_columns/2); 
+                
             end
             
+        % if the user wants to use the default:
         case 'No. Just use the default.'
-            tile_row_middle = round(num_rows/2);
-            tile_column_middle = round(num_columns/2);
+            
+            % do nothing
         
+        % if the user wants to enter an overlap:
         case 'No. I will enter an overlap manually'
-            tile_row_middle = round(num_rows/2);
-            tile_column_middle = round(num_columns/2);
+            
+            % do nothing
+            
     end
    
     % get the position of the images used to calculate overlap
@@ -73,11 +83,11 @@ function [shift_column, shift_row, image_size] = get_shift(images, num_rows, num
     image_info_right = colonycounting_v2.utilities.get_structure_results_containing_string(list_images, 'name', position_num_right_string);
     
     % load the images:
-    image_middle = readmm(fullfile(image_info_middle(1).folder, image_info_middle(1).name));
+    image_middle = readmm(fullfile(path_images, image_info_middle(1).name));
     image_middle = image_middle.imagedata;
-    image_below = readmm(fullfile(image_info_below(1).folder, image_info_below(1).name));
+    image_below = readmm(fullfile(path_images, image_info_below(1).name));
     image_below = image_below.imagedata;
-    image_right = readmm(fullfile(image_info_right(1).folder, image_info_right(1).name));
+    image_right = readmm(fullfile(path_images, image_info_right(1).name));
     image_right = image_right.imagedata;
 
     % get image size:
@@ -113,7 +123,7 @@ function [shift_column, shift_row, image_size] = get_shift(images, num_rows, num
         case 'Enter an Overlap'
             
             % get coordinates:
-            [shift_column, shift_row] = colonycounting_v2.stitch_all_scans.get_shifts_to_align.get_shift_overlap(folder, name_scan);
+            [shift_column, shift_row] = colonycounting_v2.stitch_all_scans.get_shifts_to_align.get_shift_overlap(name_folder, name_scan);
             
             % adjust shift distances so that they have the same axes as
             % those set visually:

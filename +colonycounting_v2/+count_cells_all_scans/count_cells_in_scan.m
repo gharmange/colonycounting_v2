@@ -1,4 +1,4 @@
-function [cells_position, cells_stitch, cells_stitch_small] = count_cells_in_scan(list_images, stitch_coords, scale_rows, scale_columns, stitch_small)
+function [cells_position, cells_stitch, cells_stitch_small] = count_cells_in_scan(list_images, path_images, stitch_coords, scale_rows, scale_columns, stitch_small)
 
     % get number of images:
     num_images = numel(list_images);
@@ -17,7 +17,7 @@ function [cells_position, cells_stitch, cells_stitch_small] = count_cells_in_sca
         image_name = list_images(i).name;
         
         % load the image:
-        image = readmm(fullfile(list_images(i).folder, image_name));
+        image = readmm(fullfile(path_images, image_name));
         image = image.imagedata;
         
         % count the cells in the image:
