@@ -20,8 +20,9 @@ function image_density = create_density_image(image_original, window)
             x_max = min(j + window, image_width);
 
             % get the number of non-zero elements (cells) within the window:
-            image_density(i,j) = nnz(image_original(y_min:y_max, x_min:x_max));
-
+%             image_density(i,j) = nnz(image_original(y_min:y_max, x_min:x_max));
+            image_density(i,j) = sum(sum(image_original(y_min:y_max, x_min:x_max)));
+            
         end
 
     end

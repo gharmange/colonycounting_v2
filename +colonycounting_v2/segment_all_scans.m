@@ -54,21 +54,22 @@
                 
                 % create structure to store boundaries:
                 boundaries = struct;
+                
                 boundaries.well.stitch_original.status = [];
                 boundaries.well.stitch_original.coordinates_boundary = [];
                 boundaries.well.stitch_original.coordinates_mask = [];
+                
                 boundaries.well.stitch_small.status = [];
                 boundaries.well.stitch_small.coordinates_boundary = [];
                 boundaries.well.stitch_small.coordinates_mask = [];
+                
                 boundaries.colonies.stitch_original.status = [];
                 boundaries.colonies.stitch_original.coordinates_boundary = [];
                 boundaries.colonies.stitch_original.coordinates_mask = [];
+                
                 boundaries.colonies.stitch_small.status = [];
                 boundaries.colonies.stitch_small.coordinates_boundary = [];
                 boundaries.colonies.stitch_small.coordinates_mask = [];
-                
-                % guess the colony boundaries: 
-                boundaries.colonies.stitch_small = colonycounting_v2.segment_all_scans.guess_colonies(cells.all.stitch_small, boundaries.colonies.stitch_original, stitch_small);
                 
             end
             
@@ -83,6 +84,18 @@
             
             % save boundaries:
             save(fullfile(path_scan, file_name_boundaries), 'boundaries');
+            
+            % ask the user if they want the computer to guess the colonies:
+            answer = questdlg('Do you want the computer to guess the colony boundaries?', 'Colony Segmentation', 'Yes', 'No', 'No');
+            
+            % if the user wants to have the computer guess the colony
+            % boundaries:
+            if strcmp(answer, 'Yes')
+            
+                % guess the colony boundaries: 
+                boundaries.colonies.stitch_small = colonycounting_v2.segment_all_scans.guess_colonies(cells.all.stitch_small, boundaries.colonies.stitch_original, stitch_small, boundaries.well.stitch_small);
+            
+            end
             
             % segment the colonies:
             instructions_colonies = 'Segment the colonies.';
@@ -104,21 +117,18 @@
             %%% and save. Note that we overlay the results specifically on
             %%% the SMALL stitch because the necessary MATLAB functions do
             %%% not like very large images. 
-            
-            % load already annotated stitch:
-            stitch_small_annotated_old = imread(fullfile(path_scan, sprintf('Segment_Small_%s.tif', name_scan)));
-            
+                       
             % overlay on stitch:
-%             stitch_small_annotated = colonycounting_v2.segment_all_scans.overlay_on_image(stitch_small, cells);
-            stitch_small_annotated_new = colonycounting_v2.segment_all_scans.overlay_on_image(stitch_small_annotated_old, cells);
+            stitch_small_annotated = colonycounting_v2.segment_all_scans.overlay_on_image(stitch_small, cells);
             
             % save boundaries:
+            boundaries.cells.well = cells.well;
+            boundaries.cells.colonies = cells.colonies;
             save(fullfile(path_scan, file_name_boundaries), 'boundaries');
             
             % save the annotated images:
-%             imwrite(stitch_small_annotated, fullfile(path_scan, sprintf('Segment_Small_%s.tif', name_scan)));
-            imwrite(stitch_small_annotated_new, fullfile(path_scan, sprintf('Segment_Small_%s_new.tif', name_scan)));
-            
+            imwrite(stitch_small_annotated, fullfile(path_scan, sprintf('Segment_Small_%s.tif', name_scan)));
+
         end
         
     end

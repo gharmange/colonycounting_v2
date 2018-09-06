@@ -3,6 +3,11 @@ function boundaries = gui_to_segment_a_stitch(stitch, boundaries, instructions)
     % create GUI:
     handles = create_GUI;
     
+    % make the figure larger;
+    set(handles.figure, ...
+        'Units', 'normalized', ...
+            'Position', [0, 0, .5, .9]);
+    
     % set default thresholds to use:
     threshold_min = 0.0;
     threshold_max = 1.0;

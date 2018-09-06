@@ -1,7 +1,7 @@
 function [colony_centroids_x, colony_centroids_y] = get_colony_centroids(image)
 
     % blur the density image:
-    image_blur = imgaussfilt(image, 15);
+    image_blur = imgaussfilt(image, 10);
 
     % get regionl max:
     regional_max = imregionalmax(image_blur);
