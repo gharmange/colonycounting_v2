@@ -18,69 +18,95 @@ function boundaries = gui_to_segment_a_stitch(stitch, boundaries, instructions)
     % function to create GUI:
     function handles = create_GUI
         
+        % set sizes:
+        margin = 0.01;
+        image_height = 0.6;
+        
+        figure_start_x = 0;
+        figure_start_y = 0;
+        figure_width = 1;
+        figure_height = 1;
+        
+        width_full = figure_width - 2*margin;
+        width_half = (width_full - margin)/2;
+        height_all = (figure_height - image_height - 6*margin)/4;
+        
+        image_start_x = margin;
+        image_start_y = margin;
+        image_width = width_full;
+        
+        contrast_lower_start_x = margin;
+        contrast_lower_start_y = image_start_y + image_height + margin;
+        contrast_lower_width = width_full;
+        contrast_lower_height = height_all;
+        
+        contrast_upper_start_x = margin;
+        contrast_upper_start_y = contrast_lower_start_y + height_all + margin;
+        contrast_upper_width = width_full;
+        contrast_upper_height = height_all;
+        
+        add_start_x = margin;
+        add_start_y = contrast_upper_start_y + height_all + margin;
+        add_width = width_half;
+        add_height = height_all;
+        
+        done_start_x = add_start_x + width_half + margin;
+        done_start_y = add_start_y;
+        done_width = width_half;
+        done_height = height_all;
+        
+        instructions_start_x = margin;
+        instructions_start_y = done_start_y + height_all + margin;
+        instructions_width = width_full;
+        instructions_height = height_all;
+        
         % create figure:
-        handles.figure = figure('Units', 'pixels', ...
-            'Position', [0 0 500 600]);
+        handles.figure = figure('Units', 'normalized', ...
+            'Position', [figure_start_x, figure_start_y, figure_width, figure_height]);
         
         % move gui to the center of the screen:
         movegui(handles.figure, 'center');
         
         % add image:
-        handles.image = axes('Units', 'pixels', ...
-            'Position', [30 10 440 440]);
-        
-        % add text to label lower contrast slider:
-        handles.contrast_lower_text = uicontrol('Style', 'text', ...
-            'Units', 'pixels', ...
-            'Position', [10 460 480 15], ...
-            'String', 'lower threshold');
-        
-        % add text to label upper contrast slider:
-        handles.contrast_upper_text = uicontrol('Style', 'text', ...
-            'Units', 'pixels', ...
-            'Position', [10 495 480 15], ...
-            'String', 'upper threshold');
+        handles.image = axes('Units', 'normalized', ...
+            'Position', [margin, margin, image_width, image_height]);
         
         % add button to adjust lower end of contrast:
         handles.contrast_lower = uicontrol('Style', 'slider', ...
-            'Units', 'pixels', ...
-            'Position', [10 460 480 25], ...
+            'Units', 'normalized', ...
+            'Position', [contrast_lower_start_x, contrast_lower_start_y, contrast_lower_width, contrast_lower_height], ...
             'Callback', @callback_contrast_lower, ...
             'min', 0, 'max', 1, 'Value', 0);
         
         % add button to adjust upper end of contrast:
         handles.contrast_upper = uicontrol('Style', 'slider', ...
-            'Units', 'pixels', ...
-            'Position', [10 495 480 25], ...
+            'Units', 'normalized', ...
+            'Position', [contrast_upper_start_x, contrast_upper_start_y, contrast_upper_width, contrast_upper_height], ...
             'Callback', @callback_contrast_upper, ...
             'min', 0, 'max', 1, 'Value', 1);
         
         % add button to add a segmentation:
         handles.add = uicontrol('Style', 'pushbutton', ...
-            'Units', 'pixels', ...
-            'Position', [10 530 235 25], ...
-            'String', 'Add Segmentation', ...
+            'Units', 'normalized', ...
+            'Position', [add_start_x, add_start_y, add_width, add_height], ...
+            'String', 'Add', ...
+            'FontSize', 20, ...
             'Callback', @callback_add);
-        
-        % add button to delete a segmentation:
-        handles.delete = uicontrol('Style', 'pushbutton', ...
-            'Units', 'pixels', ...
-            'Position', [255 530 235 25], ...
-            'String', 'Delete Segmentation', ...
-            'Callback', @callback_delete);
         
         % add button to be done:
         handles.done = uicontrol('Style', 'pushbutton', ...
-            'Units', 'pixels', ...
-            'Position', [255 565 235 25], ...
+            'Units', 'normalized', ...
+            'Position', [done_start_x, done_start_y, done_width, done_height], ...
             'String', 'Done', ...
+            'FontSize', 20, ...
             'Callback', @callback_done);
         
         % add instructions:
         uicontrol('Style', 'text', ...
-            'Units', 'pixels', ...
-            'Position', [10 565 235 25], ...
-            'String', instructions);
+            'Units', 'normalized', ...
+            'Position', [instructions_start_x, instructions_start_y, instructions_width, instructions_height], ...
+            'FontSize', 26, ...
+            'String', sprintf('Segment the %s. Add segmentations by clicking "Add", drawing on the image, and double-clicking within the annotation. Delete segmentations by right clicking on the segmentation to delete. Adjust the image contrast using the sliders.', instructions));
         
     end
 
@@ -92,6 +118,9 @@ function boundaries = gui_to_segment_a_stitch(stitch, boundaries, instructions)
         
         % plot boundaries:
         plot_boundaries;
+        
+        % establish callback for deleting segmentation:
+        set(gcf, 'WindowButtonDownFcn', @callback_delete);
         
         % have program wait:
         uiwait(handles.figure);
@@ -189,30 +218,41 @@ function boundaries = gui_to_segment_a_stitch(stitch, boundaries, instructions)
     % callback to delete a segmentation:
     function callback_delete(~, ~)
         
-        % wait until the user has clicked on the image:
-        temp = waitforbuttonpress;
+        % if the click was a right click:
+        if strcmp(get(gcf, 'SelectionType'), 'alt')
+           
+            % ask user to click on image:
+            [point] = get(gca, 'CurrentPoint');
 
-        % ask user to click on image:
-        [point] = get(gca, 'CurrentPoint');
+            % round point:
+            point = fliplr(round(point(1, 1:2)));
+            
+            % get coordiantes within radius of point:
+            radius = 10;
+            
+            point_radius_x = point(1)-radius:point(1)+radius;
+            point_radius_y = point(2)-radius:point(2)+radius;
+            [point_radius_x, point_radius_y] = meshgrid(point_radius_x, point_radius_y);
+            point_radius = cat(2, point_radius_x, point_radius_y);
+            point_radius = reshape(point_radius, [], 2);
 
-        % round point:
-        point = fliplr(round(point(1, 1:2)));
+            % for each current boundary point:
+            for i = 1:numel(boundaries)
 
-        % for each current boundary point:
-        for i = 1:numel(boundaries)
+                % if any point(s) falls within mask:
+                if any(ismember(point_radius, boundaries(i).coordinates_mask, 'rows'))
 
-            % if point falls within mask:
-            if ismember(point, boundaries(i).coordinates_mask, 'rows')
+                    % set that boundaries status to remove:
+                    boundaries(i).status = 'remove';
 
-                % set that boundaries status to remove:
-                boundaries(i).status = 'remove';
+                end
 
             end
 
+            % view the image:
+            view_image;
+            
         end
-
-        % view the image:
-        view_image;
         
     end
 

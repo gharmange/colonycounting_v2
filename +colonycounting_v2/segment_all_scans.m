@@ -79,7 +79,7 @@
             %%% function to crash (and the user would lose their work).
             
             % segment the well:
-            instructions_well = 'Segment the well.';
+            instructions_well = 'well';
             boundaries.well.stitch_small = colonycounting_v2.segment_all_scans.gui_to_segment_a_stitch(stitch_small, boundaries.well.stitch_small, instructions_well);
             
             % save boundaries:
@@ -98,7 +98,7 @@
             end
             
             % segment the colonies:
-            instructions_colonies = 'Segment the colonies.';
+            instructions_colonies = 'colonies';
             boundaries.colonies.stitch_small = colonycounting_v2.segment_all_scans.gui_to_segment_a_stitch(stitch_small, boundaries.colonies.stitch_small, instructions_colonies);
 
             % save boundaries:
