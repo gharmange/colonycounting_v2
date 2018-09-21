@@ -57,8 +57,6 @@ function [cells_position, cells_stitch, cells_stitch_small] = count_cells_in_sca
 
     % convert the cell centroids to the reference frame of the small
     % stitch:
-%     cells_stitch_small(:,2) = round(cells_stitch(:,2) / scale_rows);
-%     cells_stitch_small(:,1) = round(cells_stitch(:,1) / scale_columns);
     cells_stitch_small(:,2) = cells_stitch(:,2) / scale_rows;
     cells_stitch_small(:,1) = cells_stitch(:,1) / scale_columns;
 
