@@ -1,5 +1,15 @@
 function boundaries = gui_to_segment_a_stitch(stitch, boundaries, instructions)
 
+    % find the location of the sound bite:
+    path_notification = which('hummus.mp3');
+    
+    % load the sound bite to play:
+    [notification_sound, notification_sample_rate] = audioread(path_notification);
+    
+    % set default thresholds to use:
+    threshold_min = 0.0;
+    threshold_max = 1.0;
+
     % create GUI:
     handles = create_GUI;
     
@@ -7,14 +17,13 @@ function boundaries = gui_to_segment_a_stitch(stitch, boundaries, instructions)
     set(handles.figure, ...
         'Units', 'normalized', ...
             'Position', [0, 0, .5, .9]);
-    
-    % set default thresholds to use:
-    threshold_min = 0.0;
-    threshold_max = 1.0;
+        
+    % move gui to the center of the screen:
+    movegui(handles.figure, 'center');
     
     % view image:
     view_image;
-
+    
     % function to create GUI:
     function handles = create_GUI
         
@@ -63,9 +72,6 @@ function boundaries = gui_to_segment_a_stitch(stitch, boundaries, instructions)
         % create figure:
         handles.figure = figure('Units', 'normalized', ...
             'Position', [figure_start_x, figure_start_y, figure_width, figure_height]);
-        
-        % move gui to the center of the screen:
-        movegui(handles.figure, 'center');
         
         % add image:
         handles.image = axes('Units', 'normalized', ...
@@ -194,6 +200,9 @@ function boundaries = gui_to_segment_a_stitch(stitch, boundaries, instructions)
         % wait for user to double-click:
         wait(handle_boundary);
 
+        % make a sound when the user has finished a boundary:
+        sound(notification_sound, notification_sample_rate);
+        
         % get status of boundary:
         temp.status = 'keep';
         
@@ -229,7 +238,6 @@ function boundaries = gui_to_segment_a_stitch(stitch, boundaries, instructions)
             
             % get coordiantes within radius of point:
             radius = 10;
-            
             point_radius_x = point(1)-radius:point(1)+radius;
             point_radius_y = point(2)-radius:point(2)+radius;
             [point_radius_x, point_radius_y] = meshgrid(point_radius_x, point_radius_y);
@@ -244,6 +252,9 @@ function boundaries = gui_to_segment_a_stitch(stitch, boundaries, instructions)
 
                     % set that boundaries status to remove:
                     boundaries(i).status = 'remove';
+                    
+                    % make a sound when the user has finished a boundary:
+                    sound(notification_sound, notification_sample_rate);
 
                 end
 
