@@ -47,7 +47,8 @@ function [shift_column, shift_row, image_size] = get_shift(images, num_rows, num
     option_alignment_middle = 'Visually with the position shown';
     option_alignment_choice = 'Visually with a position of my choosing';
     option_alignment_overlap = 'Entering the pixel overlaps';
-    answer = questdlg(question_alignment, title_alignment, option_alignment_middle, option_alignment_choice, option_alignment_overlap, option_alignment_middle);
+    option_alignment_automated = 'Automated alignment';
+    answer = questdlg(question_alignment, title_alignment, option_alignment_middle, option_alignment_choice, option_alignment_automated, option_alignment_automated);
 
     % close the image:
     close(handle_display);
@@ -95,6 +96,37 @@ function [shift_column, shift_row, image_size] = get_shift(images, num_rows, num
             % get row shift distances:
             shift_row = colonycounting_v2.stitch_all_scans.get_shifts_to_align.get_shift_visually(image_middle, image_right);
             
+        % if the user wants to let the computer do it.    
+        case option_alignment_automated
+            
+
+            
+            % get column shift distances:
+            
+            c = normxcorr2(image_middle,image_below);
+            [max_c, imax] = max(abs(c(:)));
+            [ypeak, xpeak] = ind2sub(size(c),imax(1));
+            corr_offset = [(xpeak-size(image_middle,2)) (ypeak-size(image_middle,1))];
+            corr_offset = -corr_offset;
+            
+            shift_column.row = corr_offset(1);
+            shift_column.column = corr_offset(2);
+            
+            %shift_column = colonycounting_v2.stitch_all_scans.get_shifts_to_align.get_shift_visually(image_middle, image_below);
+            
+            % get row shift distances:
+            
+            c = normxcorr2(image_middle,image_right);
+            [max_c, imax] = max(abs(c(:)));
+            [ypeak, xpeak] = ind2sub(size(c),imax(1));
+            corr_offset = [(xpeak-size(image_middle,2)) (ypeak-size(image_middle,1))];
+            corr_offset = -corr_offset;
+
+            shift_row.row = corr_offset(1);
+            shift_row.column = corr_offset(2);
+            %shift_row = colonycounting_v2.stitch_all_scans.get_shifts_to_align.get_shift_visually(image_middle, image_right);
+            
+
         % if the user wants to align the images by entering an overlap:
         case option_alignment_overlap
             
