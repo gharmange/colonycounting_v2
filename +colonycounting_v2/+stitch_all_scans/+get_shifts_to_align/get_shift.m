@@ -44,43 +44,47 @@ function [shift_column, shift_row, image_size] = get_shift(images, num_rows, num
     % ask user how they would like to do the alignment:
     question_alignment = 'How do you want to align the images?';
     title_alignment = 'Scan Alignment';
-    option_alignment_middle = 'Visually with the position shown';
-    option_alignment_choice = 'Visually with a position of my choosing';
+    option_alignment_automated = 'Automated';
+    option_alignment_manual = 'Manually';
     option_alignment_overlap = 'Entering the pixel overlaps';
-    option_alignment_automated = 'Automated alignment';
-    answer = questdlg(question_alignment, title_alignment, option_alignment_middle, option_alignment_choice, option_alignment_automated, option_alignment_automated);
+    answer = questdlg(question_alignment, title_alignment, option_alignment_automated, option_alignment_manual, option_alignment_overlap, option_alignment_automated);
 
     % close the image:
     close(handle_display);
     
-    % depending on the answer:
-    switch answer
-        
-        % if the user wants to enter a position:
-        case option_alignment_choice
+    % if the user wants to align the images manually:
+    if strcmp(answer, option_alignment_manual)
             
+        % ask the user if they want to use a different image position:
+        change_position = questdlg('Do you want to use this position for aligning the images?', 'Scan Alignment', 'Yes', 'No', 'Yes');
+
+        % dif the user wants to user a different position:
+        if strcmp(change_position, 'No')
+
             % get the users desired image position:
             question_position = [{sprintf('Entor row (1-%d)', num_rows)}, {sprintf('Entor column (1-%d)', num_columns)}];
             title_position = 'Which image would you like to use for alignment?';
             position = inputdlg(question_position, title_position, [1 50]);
             position = str2double(position);
-            
+
             % if the position is in range of the scan: 
             if all((position >= 1) & (position(1) <= num_rows) & (position(2) <= num_columns)) 
-                
+
                 % update the position to use for the alignment:
                 tile_row_middle = position(1);
                 tile_column_middle = position(2); 
-                
+
                 % get the new images:
                 [image_middle, image_below, image_right] = colonycounting_v2.stitch_all_scans.get_shifts_to_align.get_images_from_tile_numbers(tile_row_middle, tile_column_middle, matrix_of_positions, list_images, path_images);
-                
+
             % otherwise:
             else
-                
+
                 % do not update the position (and continue to use the middle):
-                
+
             end
+
+        end
 
     end
     
@@ -88,7 +92,7 @@ function [shift_column, shift_row, image_size] = get_shift(images, num_rows, num
     switch answer
             
         % if the user wants to align the images visually:
-        case {option_alignment_middle, option_alignment_choice} 
+        case {option_alignment_manual, option_alignment_choice} 
             
             % get column shift distances:
             shift_column = colonycounting_v2.stitch_all_scans.get_shifts_to_align.get_shift_visually(image_middle, image_below);
@@ -99,33 +103,23 @@ function [shift_column, shift_row, image_size] = get_shift(images, num_rows, num
         % if the user wants to let the computer do it.    
         case option_alignment_automated
             
-
-            
             % get column shift distances:
-            
             c = normxcorr2(image_middle,image_below);
             [max_c, imax] = max(abs(c(:)));
             [ypeak, xpeak] = ind2sub(size(c),imax(1));
             corr_offset = [(xpeak-size(image_middle,2)) (ypeak-size(image_middle,1))];
             corr_offset = -corr_offset;
-            
             shift_column.row = corr_offset(1);
             shift_column.column = corr_offset(2);
-            
-            %shift_column = colonycounting_v2.stitch_all_scans.get_shifts_to_align.get_shift_visually(image_middle, image_below);
-            
+                        
             % get row shift distances:
-            
             c = normxcorr2(image_middle,image_right);
             [max_c, imax] = max(abs(c(:)));
             [ypeak, xpeak] = ind2sub(size(c),imax(1));
             corr_offset = [(xpeak-size(image_middle,2)) (ypeak-size(image_middle,1))];
             corr_offset = -corr_offset;
-
             shift_row.row = corr_offset(1);
             shift_row.column = corr_offset(2);
-            %shift_row = colonycounting_v2.stitch_all_scans.get_shifts_to_align.get_shift_visually(image_middle, image_right);
-            
 
         % if the user wants to align the images by entering an overlap:
         case option_alignment_overlap

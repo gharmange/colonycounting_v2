@@ -1,67 +1,52 @@
-function [cells_position, cells_stitch, cells_stitch_small] = count_cells_in_scan(list_images, path_images, stitch_coords, scale_rows, scale_columns, stitch_small)
+function centroids_keep = count_cells_in_scan_gaussian_filter(image)
 
-    % get number of images:
-    num_images = numel(list_images);
+    %%% First, we want to smooth the image and find regional max. These
+    %%% will be the centroids of the cells. 
 
-    % create structure to store centroids:
-    [cells_position(1:num_images).image_name] = deal('');
-    [cells_position(1:num_images).coords] = deal([]);
-
-    % create array to store centroids for the entire stitch:
-    cells_stitch = [];
+    % set the gaussian filter to use:
+    function_gaussian = @(block_struct) ...
+        imgaussfilt(block_struct.data, 7);
     
-    % for each image:
-    for i = 1:num_images
-       
-        % get the image name:
-        image_name = list_images(i).name;
-        
-        % load the image:
-        image = readmm(fullfile(path_images, image_name));
-        image = image.imagedata;
-        
-        % count the cells in the image:
-        coords = colonycounting_v2.count_cells_all_scans.count_cells_in_scan.count_cells_in_image(image);
-        
-        % get position number of the image:
-        position_number = str2double(image_name(strfind(image_name, 's')+1:strfind(image_name, 't')-2));
+    % smooth image with a gaussian (using block processing):
+    image_blurred = blockproc(image, [11000 11000], function_gaussian, 'BorderSize', [200 200]);
 
-        % get the stitch coords for the image:
-        stitch_coords_image = colonycounting_v2.utilities.get_structure_results_matching_number(stitch_coords, 'position_num_linear', position_number);
+    % set the regional max to use:
+    function_max = @(block_struct)...
+        imregionalmax(block_struct.data);
+    
+    % sget regional max of the smoothed image (using block processing):
+    image_max = blockproc(image_blurred, [11000 11000], function_max, 'BorderSize', [200 200]);
 
-        % if the image has an image that overlaps to the left:
-        if ~strcmp(stitch_coords_image.overlap_left.stitch, 'none')
+    % find connected components:
+    CC = bwconncomp(image_max);
+    
+    % get centroids:
+    centroids = regionprops(CC,'Centroid');
+    centroids = [centroids.Centroid];
+    centroids = reshape(centroids,2,[])'; 
+    centroids = round(centroids); 
+    
+    %%% Next, we want to eliminate centroids where the image intensity is
+    %%% below a threshold. This will get rid of any false positives. 
 
-            coords = colonycounting_v2.count_cells_all_scans.count_cells_in_scan.remove_cells_in_overlap(coords, stitch_coords_image.overlap_left.position);
-
-        end
-        
-        % if the image has an image that overlaps above:
-        if ~strcmp(stitch_coords_image.overlap_above.stitch, 'none')
-
-            coords = colonycounting_v2.count_cells_all_scans.count_cells_in_scan.remove_cells_in_overlap(coords, stitch_coords_image.overlap_above.position);
-
-        end
-        
-        % convert coords to reference frame of the stitch:
-        coords_stitch_position = zeros(size(coords));
-        coords_stitch_position(:,2) = coords(:,2) + stitch_coords_image.corner_ul_row;
-        coords_stitch_position(:,1) = coords(:,1) + stitch_coords_image.corner_ul_column;
-        
-        % save:
-        cells_position(i).image_name = image_name;
-        cells_position(i).coords = coords;
-        cells_stitch = [cells_stitch; coords_stitch_position];
-        
+    % get the image intensity at every centroid:
+    centroids_intensity = zeros(1, size(centroids, 1));
+    for i = 1:size(centroids, 1)
+        centroids_intensity(i) = image_blurred(centroids(i,2),centroids(i,1));
     end
+    
+    % create a histogram of the centroid intensities:
+    figure('visible', 'off');
+    histogram_handle = histogram(centroids_intensity);
+    histogram_x = histogram_handle.BinEdges;
+    histogram_y = histogram_handle.Values;
 
-    % convert the cell centroids to the reference frame of the small
-    % stitch:
-    cells_stitch_small(:,2) = cells_stitch(:,2) / scale_rows;
-    cells_stitch_small(:,1) = cells_stitch(:,1) / scale_columns;
+    % get the inflection point of the histogram:
+    histogram_y_derivative = diff(histogram_y);
+    inflection_y = find(histogram_y_derivative>0, 1) + 1;
+    inflection_x = 1/2 * (histogram_x(inflection_y) + histogram_x(inflection_y + 1));
 
-    % make sure the coords are within the bounds of the image:
-    cells_stitch_small(:,2) = min(max(cells_stitch_small(:,2), 1), size(stitch_small, 2));
-    cells_stitch_small(:,1) = min(max(cells_stitch_small(:,1), 1), size(stitch_small, 1));
+    % keep the centroids past the inflection point of the histogram:
+    centroids_keep = centroids(centroids_intensity > inflection_x,:);
 
 end

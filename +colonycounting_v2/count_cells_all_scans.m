@@ -26,17 +26,14 @@ function count_cells_all_scans(varargin)
             % get the name of the scan:
             name_scan = stitch_info.name_scan;
             
-            % get the name of the dapi stitch:
+            % get the names of the dapi stitch:
             name_stitch = sprintf('Stitch_Original_%s_%s.mat', name_scan, 'dapi');
             name_stitch_small = sprintf('Stitch_Small_%s_%s.tif', name_scan, 'dapi');
             
-            % load the small stitch:
+            % load the stitches:
+            stitch = colonycounting_v2.utilities.load_structure_from_file(fullfile(path_scan, name_stitch));
             stitch_small = readmm(fullfile(path_scan, name_stitch_small));
             stitch_small = stitch_small.imagedata;
-            
-            % get the list of DAPI images (for counting cells):
-            list_images = colonycounting_v2.utilities.get_structure_results_matching_string(stitch_info.images, 'channel', 'dapi');
-            list_images = list_images.list_images;
             
             %%% Next, count the cells in each individual position.
             
@@ -44,14 +41,11 @@ function count_cells_all_scans(varargin)
             colonycounting_v2.utilities.display_status('Counting cells in', name_stitch, path_scan);
             
             % count the cells:
-            [cells.all.position, ...
-                cells.all.stitch, ...
-                cells.all.stitch_small] = ...
-                colonycounting_v2.count_cells_all_scans.count_cells_in_scan(...
-                list_images, path_scan, ...
-                stitch_info.stitch_coords, ...
-                stitch_info.scale_rows, stitch_info.scale_columns, ...
-                stitch_small);
+            cells.all.stitch = colonycounting_v2.count_cells_all_scans.count_cells_in_scan_gaussian_filter(stitch);
+            
+            % convert the cell coords to the reference frame of the small stitch:
+            cells.all.stitch_small(:,2) = cells.all.stitch(:,2) / stitch_info.scale_rows;
+            cells.all.stitch_small(:,1) = cells.all.stitch(:,1) / stitch_info.scale_columns;
             
             %%% Next, plot the cells on the small stitch and save. Note
             %%% that specifically the small stitch is annotated as the
@@ -60,10 +54,10 @@ function count_cells_all_scans(varargin)
             
             % overlay on stitch:
             stitch_small_annotated = colonycounting_v2.count_cells_all_scans.overlay_on_image(stitch_small, cells.all.stitch_small);
-            
+                        
             % save annotated stitched image:
             imwrite(stitch_small_annotated, fullfile(path_scan, sprintf('Cell_Small_%s.tif', name_scan)));
-            
+                         
             % save cells:
             save(fullfile(path_scan, sprintf('Cell_Info_%s.mat', stitch_info.name_scan)), 'cells');
             
