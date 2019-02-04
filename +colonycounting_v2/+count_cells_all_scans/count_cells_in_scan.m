@@ -1,4 +1,4 @@
-function centroids_keep = count_cells_in_scan_gaussian_filter(image)
+function centroids_keep = count_cells_in_scan(image)
 
     %%% First, we want to smooth the image and find regional max. These
     %%% will be the centroids of the cells. 

@@ -92,7 +92,7 @@ function [shift_column, shift_row, image_size] = get_shift(images, num_rows, num
     switch answer
             
         % if the user wants to align the images visually:
-        case {option_alignment_manual, option_alignment_choice} 
+        case option_alignment_manual 
             
             % get column shift distances:
             shift_column = colonycounting_v2.stitch_all_scans.get_shifts_to_align.get_shift_visually(image_middle, image_below);

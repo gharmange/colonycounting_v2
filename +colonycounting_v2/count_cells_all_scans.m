@@ -41,7 +41,8 @@ function count_cells_all_scans(varargin)
             colonycounting_v2.utilities.display_status('Counting cells in', name_stitch, path_scan);
             
             % count the cells:
-            cells.all.stitch = colonycounting_v2.count_cells_all_scans.count_cells_in_scan_gaussian_filter(stitch);
+            cells = struct;
+            cells.all.stitch = colonycounting_v2.count_cells_all_scans.count_cells_in_scan(stitch);
             
             % convert the cell coords to the reference frame of the small stitch:
             cells.all.stitch_small(:,2) = cells.all.stitch(:,2) / stitch_info.scale_rows;
