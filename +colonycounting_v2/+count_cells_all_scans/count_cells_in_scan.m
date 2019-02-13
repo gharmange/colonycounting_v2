@@ -38,15 +38,30 @@ function centroids_keep = count_cells_in_scan(image)
     % create a histogram of the centroid intensities:
     figure('visible', 'off');
     histogram_handle = histogram(centroids_intensity);
-    histogram_x = histogram_handle.BinEdges;
+    
+    % get the x- and y-values of the histogram:
     histogram_y = histogram_handle.Values;
+    histogram_x = histogram_handle.BinEdges;
 
-    % get the inflection point of the histogram:
+    % format the x-values of the histogram to be from the center of each
+    % bar:
+    histogram_x = mean([histogram_x(1:end-1); histogram_x(2:end)]);
+    
+    % get indices where the slope is positive:
     histogram_y_derivative = diff(histogram_y);
-    inflection_y = find(histogram_y_derivative>0, 1) + 1;
-    inflection_x = 1/2 * (histogram_x(inflection_y) + histogram_x(inflection_y + 1));
+    indices_slope_positive = find(histogram_y_derivative > 0) + 1; 
+    
+    % get indices past the max of the histogram:
+    [~, index_max] = max(histogram_y);
+    indices_beyond_max = find(histogram_x > histogram_x(index_max+1));
+    
+    % get the FIRST index where both conditions are true:
+    index_threshold = indices_slope_positive(find(indices_slope_positive > indices_beyond_max(1), 1));
+    
+    % get the x-value at this index (this is the intensity threshold):
+    threshold = histogram_x(index_threshold);
 
     % keep the centroids past the inflection point of the histogram:
-    centroids_keep = centroids(centroids_intensity > inflection_x,:);
+    centroids_keep = centroids(centroids_intensity > threshold, :);
 
 end
