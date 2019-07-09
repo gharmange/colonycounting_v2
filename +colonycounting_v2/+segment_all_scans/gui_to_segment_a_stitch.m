@@ -1,10 +1,10 @@
 function boundaries = gui_to_segment_a_stitch(stitch, boundaries, instructions)
 
     % find the location of the sound bite:
-    path_notification = which('hummus.mp3');
+    %path_notification = which('hummus.mp3');
     
     % load the sound bite to play:
-    [notification_sound, notification_sample_rate] = audioread(path_notification);
+    %[notification_sound, notification_sample_rate] = audioread(path_notification);
     
     % set default thresholds to use:
     threshold_min = 0.0;
@@ -201,7 +201,7 @@ function boundaries = gui_to_segment_a_stitch(stitch, boundaries, instructions)
         wait(handle_boundary);
 
         % make a sound when the user has finished a boundary:
-        sound(notification_sound, notification_sample_rate);
+        %sound(notification_sound, notification_sample_rate);
         
         % get status of boundary:
         temp.status = 'keep';
@@ -254,7 +254,7 @@ function boundaries = gui_to_segment_a_stitch(stitch, boundaries, instructions)
                     boundaries(i).status = 'remove';
                     
                     % make a sound when the user has finished a boundary:
-                    sound(notification_sound, notification_sample_rate);
+                    %sound(notification_sound, notification_sample_rate);
 
                 end
 

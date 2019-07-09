@@ -1,4 +1,4 @@
-function overlap_above = get_overlap_above(stitch_coords_center, stitch_coords_above, image_size)
+function overlap_above = get_overlap_above(stitch_coords_center, stitch_coords_above, image_width)
 
     %%% NOTE: It is A LOT easier to understand this function if you refer
     %%% to the drawing included in the readme.
@@ -32,7 +32,7 @@ function overlap_above = get_overlap_above(stitch_coords_center, stitch_coords_a
     if stitch_coords_center.corner_ul_column < stitch_coords_above.corner_ul_column
 
         % get coords of the ul corner of the overlap:
-        overlap_above.position.corner_ul_column = image_size - overlap_width;
+        overlap_above.position.corner_ul_column = image_width - overlap_width;
 
     % if the center position is to the right of (or at) the above position:
     elseif stitch_coords_center.corner_ul_column >= stitch_coords_above.corner_ul_column

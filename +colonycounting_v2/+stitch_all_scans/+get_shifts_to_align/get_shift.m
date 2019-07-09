@@ -1,4 +1,4 @@
-function [shift_column, shift_row, image_size] = get_shift(images, num_rows, num_columns, path_images, name_folder, name_scan)
+function [shift_column, shift_row, image_height, image_width] = get_shift(images, num_rows, num_columns, path_images, name_folder, name_scan)
 
     % if there is only one wavelength:
     if numel(images) == 1
@@ -29,7 +29,8 @@ function [shift_column, shift_row, image_size] = get_shift(images, num_rows, num
     [image_middle, image_below, image_right] = colonycounting_v2.stitch_all_scans.get_shifts_to_align.get_images_from_tile_numbers(tile_row_middle, tile_column_middle, matrix_of_positions, list_images, path_images);
 
     % get image size:
-    image_size = size(image_middle, 1);
+    image_height = size(image_middle, 1);
+    image_width = size(image_middle, 2);
     
     % scale images and convert to double:
     image_middle = double(scale(image_middle));

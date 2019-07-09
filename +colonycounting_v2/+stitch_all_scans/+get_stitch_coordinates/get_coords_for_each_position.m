@@ -2,7 +2,8 @@ function scan = get_coords_for_each_position(scan)
 
     % load an image to get the image size:
     temp_image = imread(fullfile(scan.path_folder, scan.images(1).list_images(1).name));
-    image_size = size(temp_image, 1);
+    image_height = size(temp_image, 1);
+    image_width = size(temp_image, 2);
 
     % get minimum shift amounts:
     min_shift_x = extractfield(scan, 'stitch_coords');
@@ -19,8 +20,8 @@ function scan = get_coords_for_each_position(scan)
         scan.stitch_coords(i).corner_ul_column = scan.stitch_coords(i).shift_in_x - min_shift_x + 1;
 
         % get coordinates for the lower right corner:
-        scan.stitch_coords(i).corner_lr_row = scan.stitch_coords(i).corner_ul_row + image_size - 1;
-        scan.stitch_coords(i).corner_lr_column = scan.stitch_coords(i).corner_ul_column + image_size - 1;
+        scan.stitch_coords(i).corner_lr_row = scan.stitch_coords(i).corner_ul_row + image_height - 1;
+        scan.stitch_coords(i).corner_lr_column = scan.stitch_coords(i).corner_ul_column + image_width - 1;
 
     end
 

@@ -4,13 +4,14 @@ function stitch_a_wavelength(scan, images)
 
     % load an image to get the image dimensions:
     temp = readmm(fullfile(scan.path_folder, images.list_images(1).name));
-    image_size = temp.height;
+    image_height = temp.height;
+    image_width = temp.width;
 
     % get number of positions:
     num_positions = numel(images.list_images);
 
     % create empty array to store the positions as a z-stack:
-    image_stack = zeros(image_size, image_size, num_positions, 'uint16');
+    image_stack = zeros(image_height, image_width, num_positions, 'uint16');
 
     % for each position:
     for j = 1:num_positions
@@ -27,9 +28,9 @@ function stitch_a_wavelength(scan, images)
 
     % get size of stitched image:
     stitch_height = extractfield(scan, 'stitch_coords');
-    stitch_height = max(extractfield(stitch_height{1}, 'corner_ul_row')) + image_size - 1;
+    stitch_height = max(extractfield(stitch_height{1}, 'corner_ul_row')) + image_height - 1;
     stitch_width = extractfield(scan, 'stitch_coords');
-    stitch_width = max(extractfield(stitch_width{1}, 'corner_ul_column')) + image_size - 1;
+    stitch_width = max(extractfield(stitch_width{1}, 'corner_ul_column')) + image_width - 1;
 
     % create an empty array to store stitched image:
     image_stitched = zeros(stitch_height, stitch_width, 'uint16');
@@ -49,11 +50,11 @@ function stitch_a_wavelength(scan, images)
     end
 
     % create a downsized version of the stitch:
-    image_stitched_small = imresize(image_stitched, [image_size image_size]);
+    image_stitched_small = imresize(image_stitched, [image_height image_width]);
 
     % get the scale factor:
-    scan.scale_rows = size(image_stitched, 1) / image_size;
-    scan.scale_columns = size(image_stitched, 2) / image_size;
+    scan.scale_rows = size(image_stitched, 1) / image_height;
+    scan.scale_columns = size(image_stitched, 2) / image_width;
 
     % set file name:
     file_name = fullfile(scan.path_folder, sprintf('Stitch_Original_%s_%s.mat', scan.name_scan, images.channel));

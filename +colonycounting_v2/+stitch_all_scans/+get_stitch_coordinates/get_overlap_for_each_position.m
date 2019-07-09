@@ -24,7 +24,7 @@ function scan = get_overlap_for_each_position(scan)
             stitch_coords_left = colonycounting_v2.utilities.get_structure_results_matching_number(stitch_coords_left, 'position_num_row', position_num_row);
             
             % get overlap to the left:
-            overlap_left = colonycounting_v2.stitch_all_scans.get_stitch_coordinates.get_overlap_for_each_position.get_overlap_left(stitch_coords_center, stitch_coords_left, scan.image_size);
+            overlap_left = colonycounting_v2.stitch_all_scans.get_stitch_coordinates.get_overlap_for_each_position.get_overlap_left(stitch_coords_center, stitch_coords_left, scan.image_height);
           
         % otherwise:
         else
@@ -43,7 +43,7 @@ function scan = get_overlap_for_each_position(scan)
             stitch_coords_above = colonycounting_v2.utilities.get_structure_results_matching_number(stitch_coords_above, 'position_num_row', position_num_row - 1);
             
             % create structure to store overlap:
-            overlap_above = colonycounting_v2.stitch_all_scans.get_stitch_coordinates.get_overlap_for_each_position.get_overlap_above(stitch_coords_center, stitch_coords_above, scan.image_size);
+            overlap_above = colonycounting_v2.stitch_all_scans.get_stitch_coordinates.get_overlap_for_each_position.get_overlap_above(stitch_coords_center, stitch_coords_above, scan.image_width);
             
         % otherwise:
         else
