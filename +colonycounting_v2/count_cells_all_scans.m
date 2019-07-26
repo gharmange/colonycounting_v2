@@ -35,6 +35,9 @@ function count_cells_all_scans(varargin)
             stitch_small = readmm(fullfile(path_scan, name_stitch_small));
             stitch_small = stitch_small.imagedata;
             
+            % ask the user for what size gaussian they want to use:
+            gaussian_sigma = colonycounting_v2.count_cells_all_scans.set_gaussian_size(stitch_small, stitch, stitch_info.scale_rows, stitch_info.scale_columns);
+            
             %%% Next, count the cells in each individual position.
             
             % display status:
@@ -42,11 +45,14 @@ function count_cells_all_scans(varargin)
             
             % count the cells:
             cells = struct;
-            cells.all.stitch = colonycounting_v2.count_cells_all_scans.count_cells_in_scan(stitch);
+            cells.all.stitch = colonycounting_v2.count_cells_all_scans.count_cells_in_scan(stitch, gaussian_sigma);
             
             % convert the cell coords to the reference frame of the small stitch:
             cells.all.stitch_small(:,2) = cells.all.stitch(:,2) / stitch_info.scale_rows;
             cells.all.stitch_small(:,1) = cells.all.stitch(:,1) / stitch_info.scale_columns;
+            
+            % save the gaussian size:
+            cells.gaussian_sigma = gaussian_sigma;
             
             %%% Next, plot the cells on the small stitch and save. Note
             %%% that specifically the small stitch is annotated as the
