@@ -1,4 +1,4 @@
-function image_annotated = overlay_on_image(image, cells)
+function image_annotated = overlay_on_image_multichannel(image, cells, groups)
 
     % create rgb-version of image:
     image_annotated = repmat(image, 1, 1, 3);

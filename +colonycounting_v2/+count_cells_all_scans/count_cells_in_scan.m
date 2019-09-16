@@ -8,7 +8,7 @@ function centroids_keep = count_cells_in_scan(image, gaussian_sigma)
         imgaussfilt(block_struct.data, gaussian_sigma);
     
     % smooth image with a gaussian (using block processing):
-    image_blurred = blockproc(image, [11000 11000], function_gaussian, 'BorderSize', [200 200]);
+    image_blurred = blockproc(scale(image), [11000 11000], function_gaussian, 'BorderSize', [200 200]);
 
     % set the regional max to use:
     function_max = @(block_struct)...

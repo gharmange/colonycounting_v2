@@ -113,13 +113,13 @@ function varargout = set_gaussian_size(stitch_small, stitch_original, scale_rows
         stitch_original_cropped = imcrop(stitch_original, [position_original.x, position_original.y, position_original.width, position_original.height]);
 
         % count cells in the cropped stitch:
-        cells = colonycounting_v2.count_cells_all_scans.count_cells_in_scan(stitch_original_cropped, gaussian_sigma);
+        cells = colonycounting_v2.count_cells_all_scans.count_cells_in_scan(scale(stitch_original_cropped), gaussian_sigma);
 
         % display small stitch:
-        imshow(stitch_small, 'Parent', handles.axes_full);
+        imshow(scale(stitch_small), 'Parent', handles.axes_full);
 
         % display the cropped original stitch:
-        imshow(stitch_original_cropped, 'Parent', handles.axes_zoomed);
+        imshow(scale(stitch_original_cropped), 'Parent', handles.axes_zoomed);
 
         % plot the selected position:
         hold(handles.axes_full, 'on');

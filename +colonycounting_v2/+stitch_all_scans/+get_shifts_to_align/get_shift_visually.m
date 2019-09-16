@@ -1,7 +1,7 @@
 function shift = get_shift_visually(image_left, image_right)
 
     % register the image using cp select:
-    [moving, fixed] = cpselect(image_left, image_right, 'Wait', true);
+    [moving, fixed] = cpselect(scale(image_left), scale(image_right), 'Wait', true);
        
     % get the distance between each moving and fixed coords:
     distance_to_transform = moving - fixed;
