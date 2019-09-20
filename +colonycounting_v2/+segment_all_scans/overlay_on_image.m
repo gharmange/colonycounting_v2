@@ -1,4 +1,4 @@
-function image_annotated = overlay_on_image_multichannel(image, cells, groups)
+function image_annotated = overlay_on_image(image, cells)
 
     % create rgb-version of image:
     image_annotated = repmat(image, 1, 1, 3);
@@ -50,20 +50,26 @@ function image_annotated = overlay_on_image_multichannel(image, cells, groups)
     
     % for each colony:
     for i = 1:num_colonies
+        % Skip colonies with fewer than 6 points on its perimeter
+        % (likely bad segments)
         
-         % add boundary to image:
-        image_annotated = colonycounting_v2.utilities.add_boundary_to_image(image_annotated, cells.colonies(i).boundary_stitch_small, color.colonies(i, :), marker_size);
-          
+        if size(cells.colonies(i).boundary_stitch_small, 1) > 5
+            % add boundary to image:
+            image_annotated = colonycounting_v2.utilities.add_boundary_to_image(image_annotated, cells.colonies(i).boundary_stitch_small, color.colonies(i, :), marker_size);
+        end   
     end
     
     %%% Next, we want to plot all cells assigned to colonies:
     
     % for each colony:
     for i = 1:num_colonies
+        % Skip colonies with fewer than 6 points on its perimeter
+        % (likely bad segments)
         
-        % add cells to image:
-        image_annotated = colonycounting_v2.utilities.add_cells_to_image(image_annotated, cells.colonies(i).cells_stitch_small, color.colonies(i, :), marker_size);
-   
+        if size(cells.colonies(i).boundary_stitch_small, 1) > 5
+            % add cells to image:
+            image_annotated = colonycounting_v2.utilities.add_cells_to_image(image_annotated, cells.colonies(i).cells_stitch_small, color.colonies(i, :), marker_size);
+        end
     end
 
 end
