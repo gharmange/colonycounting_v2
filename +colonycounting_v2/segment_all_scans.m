@@ -30,7 +30,7 @@
             cells = colonycounting_v2.utilities.load_structure_from_file(fullfile(path_scan, sprintf('Cell_Info_%s.mat', name_scan)));
             
             % get the name of the small DAPI stitch:
-            name_stitch_small = sprintf('Stitch_Small_%s_%s.tif', name_scan, 'dapi');
+            name_stitch_small = sprintf('Plot_Stitch_Small_%s_%s.tiff', name_scan, 'dapi');
             
             % load the small stitch:
             stitch_small = readmm(fullfile(path_scan, name_stitch_small));
